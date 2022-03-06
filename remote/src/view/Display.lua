@@ -16,6 +16,8 @@ function Display:initialize(w, h)
 		self.w, self.h = love.window.getMode()
 	end
 	
+	self.font = love.graphics.newFont("assets/Symbola.ttf")
+	
 	self.fsm = Fsm()
 	self.fsm:hookIntoLove()
 	
@@ -34,7 +36,13 @@ function Display:initialize(w, h)
 end
 
 ------------------------------ API ------------------------------
+function Display:update(dt)
 
+end
+
+function Display:draw(g2d)
+	--love.graphics.setFont(self.font)
+end
 
 ------------------------------ Getters / Setters ------------------------------
 

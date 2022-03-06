@@ -12,11 +12,15 @@ function love.load(args)
 	_G.Display = Display
 end
 
+
 function love.update(dt)
 	lovebird.update()
 	Slab.Update(dt)
+	Display:update(dt)
 end
 
 function love.draw()
+	local g2d = love.graphics
 	Slab.Draw()
+	Display:draw(g2d)
 end

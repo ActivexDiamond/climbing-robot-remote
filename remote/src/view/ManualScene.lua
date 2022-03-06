@@ -39,9 +39,7 @@ function ManualScene:update(dt)
 	if Slab.Button("Back") then
 		self.fsm:goto("main_scene")
 	end
-	
-	
-		
+
 	Slab.EndWindow()
 end
 
