@@ -34,6 +34,43 @@ local window = {
 	
 }
 
+local isConfirming
+local popupQuit = {
+	id = "Quitting!",
+	msg = "Are you sure you want to quit?\n\n  You can start the program back up\nby launching \"Robot Controller\"\nfrom your desktop.",
+	Buttons = {"Quit!", "Cancel"},
+	onClick = function(result)
+		if result == "Quit!" then
+			PeripheralApi:quit()
+		end
+		return nil
+	end
+}
+
+local popupRebootRemote = {
+	id = "Rebooting Remote!",
+	msg = "Are you sure you want to reboot the remote?\n\n  This may take a few minutes.",
+	Buttons = {"Reboot!", "Cancel"},
+	onClick = function(result)
+		if result == "Reboot!" then
+			PeripheralApi:rebootRemote()
+		end
+		return nil
+	end
+}
+
+local popupRebootRobot = {
+	id = "Rebooting Robot!",
+	msg = "Are you sure you want to reboot the robot?\n\n  This may take a few minutes,\nduring which the remote will be unfunctional.",
+	Buttons = {"Reboot!", "Cancel"},
+	onClick = function(result)
+		if result == "Reboot!" then
+			PeripheralApi:rebootRobot()
+		end
+		return nil
+	end
+}
+
 ------------------------------ Core API ------------------------------
 function MainScene:update(dt)
 	Slab.BeginWindow(window.id, window)
@@ -68,14 +105,33 @@ function MainScene:update(dt)
 		self.fsm:goto("auto_scene")
 	end
 	
-	--Reboot Remote
-	local bottomY = window.H - getTextH("FOO")
+	--Bottom Toolbar - Quit
+	local bottomY = window.H - getTextH("FOO") * 2
 	Slab.SetCursorPos(0, bottomY)
 	if Slab.Button("Quit") then
-		PeripheralApi:quit()
+		isConfirming = popupQuit
 	end
 	
-	--Quit
+	--Bottom Toolbar - Reboot Remote
+	local rebootX = 220
+	Slab.SetCursorPos(rebootX, bottomY)
+	
+	if Slab.Button("Reboot Remote") then
+		isConfirming = popupRebootRemote
+	end
+	
+	--Bottom Toolbar - Reboot Robot
+	Slab.SameLine()
+	if Slab.Button("Reboot Robot") then
+		isConfirming = popupRebootRobot
+	end
+
+	if isConfirming then
+		local result = Slab.MessageBox(isConfirming.id, isConfirming.msg, isConfirming)
+		if result ~= "" then
+			isConfirming = isConfirming.onClick(result)
+		end
+	end
 	
 	Slab.EndWindow()
 end

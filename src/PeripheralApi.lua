@@ -108,19 +108,21 @@ end
 -- @return			#bool		;	Always returns false, but if the quit event propgated fully program would simply exit before this returns.
 function PeripheralApi:quit()
 	--Any clean-up or state-saving code would go here.
-	love.events.quit()
+	love.event.quit()
 	return false	--Would only ever be returned if the quit event was cancelled.
 end
 
 ---Self explanatory.
 function PeripheralApi:rebootRemote()
 	--TODO: Implement.
+	--Halt the robot (check if it's moving and if so cancel all move commands.) then reboot.
 	print("Rebooting remote!")
 end
 
 ---Self explanatory.
 function PeripheralApi:rebootRobot()
 	--TODO: Implement.
+	--Halt the robot (check if it's moving and if so cancel all move commands.) then reboot it. 
 	print("Rebooting robot!")
 end
 ------------------------------ Getters / Setters ------------------------------
