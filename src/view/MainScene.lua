@@ -31,7 +31,6 @@ local window = {
 	Y = 0,
 	W = love.graphics.getWidth(),
 	H = love.graphics.getHeight()
-	
 }
 
 local isConfirming

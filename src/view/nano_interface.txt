@@ -1,0 +1,31 @@
+Commands are in caps, abbreviated to a few letters, and followed by a semicolon to seperate commands, their args, and the following commands.
+
+AS			;	ArmStop
+args: N/A
+
+-------------------------------------------------------------------
+AU			;	ArmUp
+AD			;	ArmDown
+AF			;	ArmForward
+AB			;	ArmBackward
+arg1		;	speed		;	int[0-255] (Arduino PWM aka speed-percentile)
+
+-------------------------------------------------------------------
+WS			;	WheelStop
+WR			;	WheelRight
+WL			;	WheelLeft
+args: N/A
+
+-------------------------------------------------------------------
+WF			;	WheelForward
+WB			;	WheelBackward
+arg1		;	degrees		;	int[75-255]	(Degrees for the wheel to turn. This is mapped to [90, 0]
+
+-------------------------------------------------------------------
+CWorm		;	CutterWorm
+arg1		;	cworm angle	;	int[0, 5]	(Angle to set the cworm to. This is mapped to [10, 170]
+
+-------------------------------------------------------------------
+CWheel		;	CutterWheel
+arg1		;	cwheel angle;	int[0, 10]	(Angle to set the cwheel to. This is mapped to [0, 180]
+
