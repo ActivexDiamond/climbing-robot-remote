@@ -125,8 +125,45 @@ function PeripheralApi:rebootRobot()
 	--Halt the robot (check if it's moving and if so cancel all move commands.) then reboot it. 
 	print("Rebooting robot!")
 end
+
+------------------------------ API - Movement ------------------------------
+
 ------------------------------ Getters / Setters ------------------------------
---Are any needed here?
+---Sets the speed used by the arm movement methods which accept a speed arg.
+--This will basically be a default for when they are called with no speed arg.
+--If they are called with one, that takes priority.
+--"speed" may be nil, but if it is, and an arm movement method is called (which requires
+--	a speed-arg) is called with no args; a warning is shown to the user, with no action occuring. 
+function PeripheralApi:setArmSpeed(speed)
+	self.armSpeed = speed
+end
+function PeripheralApi:getArmSpeed()
+	return self.armSpeed
+end
+
+---Same concept as armSpeed.
+function PeripheralApi:setWheelRotAmount(deg)
+	self.wheelRotAmount = deg
+end
+function PeripheralApi:getWheelRotAmount()
+	return self.wheelRotAmount
+end
+
+---Same concept as armSpeed.
+function PeripheralApi:setCutterWormAngle(deg)
+	self.cutterWormAngle = deg
+end
+function PeripheralApi:getCutterWormAngle()
+	return self.cutterWormAngle
+end
+
+---Same concept as armSpeed.
+function PeripheralApi:setCutterWheelAngle(deg)
+	self.cutterWheelAngle = deg
+end
+function PeripheralApi:getCutterWheelAngle()
+	return self.cutterWheelAngle
+end
 
 --You know how the robot works. Do you think I missed anything?
 return PeripheralApi()
