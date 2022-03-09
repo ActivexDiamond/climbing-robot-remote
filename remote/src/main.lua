@@ -1,5 +1,7 @@
 local Slab = require "libs.Slab"
 
+local PeripheralApi = require "PeripheralApi"
+
 local lovebird = require "libs.lovebird"
 lovebird.update()					--To fix lovebird missing prints before the first love.update is called.
 
@@ -24,3 +26,22 @@ function love.draw()
 	Slab.Draw()
 	Display:draw(g2d)
 end
+
+--[[
+--			Test Cases
+
+PeripheralApi:_sendCmd("arm_stop")
+PeripheralApi:_sendCmd("arm_forward", 120)
+PeripheralApi:_sendCmd("arm_backward", 150)
+PeripheralApi:_sendCmd("arm_stop", 5)
+PeripheralApi:_sendCmd("arm_forward")
+PeripheralApi:_sendCmd("foo")
+--]]
+
+--[[
+			From PeripheralApi:_sendCmd() : The UdpApi:send(<...>) line.
+			
+Should this be changed so that all cmds get their args passed in as a table of args?
+	(including 0-arg-cmds and 1-arg-cmds.)
+	
+--]]

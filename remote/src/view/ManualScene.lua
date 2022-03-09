@@ -1,72 +1,107 @@
 local class = require "libs.middleclass"
 local Slab = require "libs.Slab"
+local lume = require "libs.lume"
 
+local AppData = require "AppData"
 local PeripheralApi = require "PeripheralApi"
 
 local State = require "libs.SimpleFsm.State"
 
 ------------------------------ Internal Constants ------------------------------
-local BUTTON_SIZE = 32
+local DEFAULT_BUTTON_SIZE = 32
+local DEFAULT_BUTTON_PAD = 0
 
 ------------------------------ Helper Methods ------------------------------
-local function buttonStepper(val, inc, callback)
-	if Slab.Button("+") then
-		callback(val + inc, val, inc)
-	end
-	
-	Slab.Text(val)
-	
-	if Slab.Button("-") then
-		callback(val - inc, val, -inc)
-	end
+local function getTextW(str)
+	local font = love.graphics.getFont()
+	local text = love.graphics.newText(font, str)
+	return text:getWidth()
 end
 
-local function dirButtonOpt(imgPath)
+local function imgButtonOpt(button_size, imgPath)
 	return {
 		id = imgPath,
-		W = BUTTON_SIZE,
-		H = BUTTON_SIZE,
+		W = button_size,
+		H = button_size,
 		Image = {Path = imgPath},
 	}
 end
 
-local function joystick(label, dirs)
+--Callback signature: f(newVal, oldVal, inc)
+local function buttonStepper(val, inc, callback, label, buttonSize, buttonPad)
+	buttonSize = buttonSize or DEFAULT_BUTTON_SIZE
+	buttonPad = buttonPad or DEFAULT_BUTTON_PAD
+	
+	local offset = buttonSize + buttonPad
+	local initX, initY = Slab.GetCursorPos()
+
+	--Plus
+	local plusOpt = imgButtonOpt(buttonSize, AppData.ASSET_DIR .. "plus.png")
+	Slab.SetCursorPos(initX, initY)
+	if Slab.Button(plusOpt.id, plusOpt) then
+		callback(val + inc, val, inc)
+	end
+	--Val
+	local xOffset = buttonSize * 0.5 - getTextW(val) / 2
+	Slab.SetCursorPos(initX + xOffset, initY + offset * 1.2)
+	Slab.Text(val)
+	--Minus
+	Slab.SetCursorPos(initX, initY + offset * 2)
+	local minusOpt = imgButtonOpt(buttonSize, AppData.ASSET_DIR .. "minus.png")
+	if Slab.Button(minusOpt.id, minusOpt) then
+		callback(val - inc, val, -inc)
+	end
+	--Label	
+	if label then
+		local xOffset = buttonSize * 0.5 - getTextW(label) / 2
+		Slab.SetCursorPos(initX + xOffset, initY + offset * 3)
+		Slab.Text(label)	
+	end
+end
+
+local function joystick(dirs, label, buttonSize, buttonPad)
+	buttonSize = buttonSize or DEFAULT_BUTTON_SIZE
+	buttonPad = buttonPad or DEFAULT_BUTTON_PAD
 	local callback = dirs.callback or function(id) 
-		print("[" .. i .. "] button was pressed.")
+		print("[" .. id .. "] button was pressed.")
 	end
 	
 	local initX, initY = Slab.GetCursorPos()
+	local offset = buttonSize + buttonPad
 	local rtVal
 	--North
-	Slab.SetCursorPos(initX, initY)
+	Slab.SetCursorPos(initX + offset, initY)
 	local n = dirs.north
-	local nOpt = dirButtonOpt(n.imgPath)
+	local nOpt = imgButtonOpt(buttonSize, n.imgPath)
 	if Slab.Button(n.id, nOpt) then
 		rtVal = n.callback and n.callback(n.id) or callback(n.id)
 	end
 	--South
-	Slab.NewLine()						--Skip the center square.
+	Slab.SetCursorPos(initX + offset, initY + offset * 2) 
 	local s = dirs.south
-	local sOpt = dirButtonOpt(s.imgPath)
+	local sOpt = imgButtonOpt(buttonSize, s.imgPath)
 	if Slab.Button(s.id, sOpt) then
 		rtVal = s.callback and s.callback(s.id) or callback(s.id)
 	end
 	
 	--Label
-	Slab.NewLine()						--Leave 1 empty space.
-	Slab.Text(label)
+	if label then
+		local xOffset = offset * 1.5 - getTextW(label) / 2 
+		Slab.SetCursorPos(initX + xOffset, initY + offset * 3)
+		Slab.Text(label)
+	end
 	
 	--West
-	Slab.SetCursorPos(initX, initY + BUTTON_SIZE)
+	Slab.SetCursorPos(initX, initY + offset)
 	local w = dirs.west
-	local wOpt = dirButtonOpt(w.imgPath)
+	local wOpt = imgButtonOpt(buttonSize, w.imgPath)
 	if Slab.Button(w.id, wOpt) then
 		rtVal = w.callback and w.callback(w.id) or callback(w.id)
 	end
 	--East
-	Slab.SetCursorPos(initX + BUTTON_SIZE * 3, initY + BUTTON_SIZE)
+	Slab.SetCursorPos(initX + offset * 2, initY + offset)
 	local e = dirs.east
-	local eOpt = dirButtonOpt(e.imgPath)
+	local eOpt = imgButtonOpt(buttonSize, e.imgPath)
 	if Slab.Button(e.id, eOpt) then
 		rtVal = e.callback and e.callback(e.id) or callback(e.id)
 	end
@@ -77,6 +112,13 @@ end
 ------------------------------ Constructor ------------------------------
 local ManualScene = class("ManualScene", State)
 function ManualScene:initialize()
+	self.buttonSize = 24
+	self.buttonPad = 4
+	self.buttonOffset = self.buttonSize + self.buttonPad
+	
+	self.foo = 0
+	self.fooMin = 0
+	self.fooMax = 5
 end
 
 ------------------------------ Widget Options ------------------------------
@@ -85,7 +127,8 @@ local window = {
 	X = 0,
 	Y = 0,
 	W = love.graphics.getWidth(),
-	H = love.graphics.getHeight()
+	H = love.graphics.getHeight(),
+	AutoSizeWindow = false,
 }
 
 ------------------------------ Core API ------------------------------
@@ -96,24 +139,54 @@ function ManualScene:update(dt)
 		self.fsm:goto("main_scene")
 	end
 
-	if Slab.Button("plus", {
-		W = 32,
-		H = 32,
-		Image = {Path = "assets/plus.png"}
-	}) then
-		print("plus")
-	end
+	--Chasis Joystick
+	Slab.SetCursorPos(self.buttonOffset, window.H - self.buttonOffset * 4.5)
+	joystick({
+		north = {id = "forward", imgPath = AppData.ASSET_DIR .. "forward.png"},
+		south = {id = "backward", imgPath = AppData.ASSET_DIR .. "backward.png"},
+		west = {id = "left", imgPath = AppData.ASSET_DIR .. "left.png"},
+		east = {id = "right", imgPath = AppData.ASSET_DIR .. "right.png"},
+		callback = function(dir)
+			PeripheralApi:moveWheel(dir)
+		end,
+	}, "Chasis\n[mov]", self.buttonSize, self.buttonPad)
+
+	--Wheel Rot Amount
+	Slab.SetCursorPos(self.buttonOffset * 4.7, window.H - self.buttonOffset * 4.5)
+	buttonStepper(PeripheralApi:getWheelRotAmount(), 10, function(newVal, oldVal, inc)
+		PeripheralApi:setWheelRotAmount(newVal)
+	end, "Wheel\n  [rot]", self.buttonSize, self.buttonPad)
 	
+	--Cutter Wheel Angle
+	Slab.SetCursorPos(self.buttonOffset * 6.9, window.H - self.buttonOffset * 4.5)
+	buttonStepper(PeripheralApi:getCutterWheelAngle(), 1, function(newVal, oldVal, inc)
+		PeripheralApi:setCutterWheelAngle(newVal)
+	end, "CWheel\n  [ang]", self.buttonSize, self.buttonPad)
+	--Cutter Worm Angle
+	Slab.SetCursorPos(self.buttonOffset * 9.1, window.H - self.buttonOffset * 4.5)
+	buttonStepper(PeripheralApi:getCutterWormAngle(), 1, function(newVal, oldVal, inc)
+		PeripheralApi:setCutterWormAngle(newVal)
+	end, "CWorm\n  [ang]", self.buttonSize, self.buttonPad)
+
+	--Arm Speed
+	Slab.SetCursorPos(self.buttonOffset * 11.3, window.H - self.buttonOffset * 4.5)
+	buttonStepper(PeripheralApi:getArmSpeed(), 15, function(newVal, oldVal, inc)
+		PeripheralApi:setArmSpeed(newVal)
+	end, "Arm\n[spd]", self.buttonSize, self.buttonPad)
+				
+	--Arm Joystick
+	Slab.SetCursorPos(window.W - self.buttonOffset * 4, window.H - self.buttonOffset * 4.5)
+	joystick({
+		north = {id = "forward", imgPath = AppData.ASSET_DIR .. "forward.png"},
+		south = {id = "backward", imgPath = AppData.ASSET_DIR .. "backward.png"},
+		west = {id = "up", imgPath = AppData.ASSET_DIR .. "up.png"},
+		east = {id = "down", imgPath = AppData.ASSET_DIR .. "down.png"},
+		callback = function(dir)
+			PeripheralApi:moveArm(dir)
+		end, 
+	}, "Arm\n[mov]", self.buttonSize, self.buttonPad)
+		
 	Slab.EndWindow()
-end
-
-function ManualScene:draw(g2d)
-end
-
-function ManualScene:enter(from, ...)
-end
-
-function ManualScene:leave(to)
 end
 
 ------------------------------ Getters / Setters ------------------------------

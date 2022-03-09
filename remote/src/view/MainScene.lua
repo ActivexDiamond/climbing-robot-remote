@@ -6,7 +6,7 @@ local AppData = require "AppData"
 
 local State = require "libs.SimpleFsm.State"
 
------------------------------- Helper ------------------------------
+------------------------------ Helper Methods ------------------------------
 local function getTextW(str)
 	local font = love.graphics.getFont()
 	local text = love.graphics.newText(font, str)
@@ -22,6 +22,12 @@ end
 ------------------------------ Constructor ------------------------------
 local MainScene = class("MainScene", State)
 function MainScene:initialize()
+	--Offline Label Animation
+	self.dotTimeDur = 0.3
+	self.dotsLen = 7
+	
+	self.dotTime = 0
+	self.dots = ""	
 end
 
 ------------------------------ Widget Options ------------------------------
@@ -30,7 +36,8 @@ local window = {
 	X = 0,
 	Y = 0,
 	W = love.graphics.getWidth(),
-	H = love.graphics.getHeight()
+	H = love.graphics.getHeight(),
+	AutoSizeWindow = false,
 }
 
 local isConfirming
@@ -87,7 +94,24 @@ function MainScene:update(dt)
 	local statusYPos = getTextH(statusStr) * 3
 	Slab.SetCursorPos(statusXPos, statusYPos)
 	Slab.Text(statusStr)
-			
+	
+	--Offline Label
+	Slab.SetCursorPos(statusXPos, statusYPos + getTextH(statusStr))
+	if not PeripheralApi:ping() then
+		Slab.Text("Reconnecting." .. self.dots)
+		self.dotTime = self.dotTime + dt
+		if self.dotTime > self.dotTimeDur then
+			self.dotTime = 0
+			self.dots = self.dots .. "."
+			if #self.dots > self.dotsLen then
+				self.dots = ""
+			end
+		end
+	else
+		self.dotTime = 0
+		self.dots = ""
+	end
+	
 	--Modes - Manual
 	local modesYPos = window.H / 2
 	local modesXOffset = 100
@@ -133,17 +157,6 @@ function MainScene:update(dt)
 	end
 	
 	Slab.EndWindow()
-end
-
-function MainScene:draw(g2d)
-end
-
-function MainScene:enter(from, ...)
-	print("Entered MainScene.")
-end
-
-function MainScene:leave(to)
-	print("Left MainScene.")
 end
 
 ------------------------------ Getters / Setters ------------------------------
