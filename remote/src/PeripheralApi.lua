@@ -64,9 +64,12 @@ local AppData = require "AppData"
 		Long-lines are used as titled seprators for sections.
 		Short-lines are used as title seperators for sub-sections.
 	
+	Variable Naming Order:
+		commands: category_module_group_action
+		Everything else is named using English ordering rules.
 --]]
 
------------------------------- Heleprs ------------------------------
+------------------------------ Helprs ------------------------------
 local function cleanUpArmArg(self, speed)
 	speed = speed or self.armSpeed
 	if not speed then
@@ -87,6 +90,10 @@ local function cleanUpWheelArg(self, deg)
 	return lume.clamp(deg, self.WHEEL_ROT_AMOUNT_MIN, self.WHEEL_ROT_AMOUNT_MAX)
 end
 
+------------------------------ Private State ------------------------------
+--Exclusively used by PeripheralApi:reconnect()
+local lastReconnectTime = 0
+
 ------------------------------ Constructor ------------------------------
 local PeripheralApi = class("PeripheralApi")
 --Note: This class is a singleton.
@@ -105,9 +112,39 @@ function PeripheralApi:initialize()
 	self.cutterWheelAngle = 0
 end
 
-
 ------------------------------ Commands ------------------------------
----Note: The "code" field is NOT used by the remote in any way,
+---[cmds]					#table
+--	Is a list of all valid commands for communication between all 3 devices.
+--
+--[cmds.x] (the key x)		#string			;	(herenby referred to as "command-name")
+--	Is an alphanumeric word,
+-- 		or words used to represent the action to be performed.
+--	It is written as: category_module_group_action,
+--		with any empty or non-relevant fields left empty.
+--	It should be human-readable and descriptive of the action.
+--	Lastly, it is used by both Pi devices (as WebSocket event names!) to direct
+--		their logic and communicate.
+--		
+--[cmds.x] (the value of x)	#table
+--	Is a table holding all data descriping the command in thorough detail.
+--	
+--[cmds.x.code]				#string
+--	Is an abbreviated version of the command-name used to communicate
+--		between the Pi 3 B (robot-based-server) and the Arduino Nano (robot-based-motor-controls.
+--	It is abbreviated to compensate for the low-speed and high-error-chance of
+--		the serial coms used to communicate with the Nano. 
+--	Further, it is abbreviated to save precious space on the Nano to allow more
+--		space for further expansion.
+--		
+--[cmds.x.args]				#number
+--	Represents the number of arguments that the command requires.
+--	As of this version, optional/default arguments are NOT supported.
+--	
+--[cmds.x.rt]				#bool
+--	Whether the command requests a return value after it's execution or not.
+--	Note that all commands which request a return value are blocking operations
+--	
+---Note: The [cmds.x.code] is NOT used by the remote in any way,
 --	and it is not even aware of it's existence.
 --It is only here to make debugging easier.
 PeripheralApi.cmds = {
@@ -167,6 +204,7 @@ function PeripheralApi:_sendCmd(cmdName, ...)
 		return nil, "got-nil: Command has no return value. It is running as expected."
 	end
 end
+
 ------------------------------ API - Hardware Constants ------------------------------
 --Speed CLamps
 PeripheralApi.ARM_SPEED_MIN = 0
@@ -220,7 +258,6 @@ function PeripheralApi:ping()
 	return UdpApi:isConnected()
 end
 
-local lastReconnectTime = 0
 function PeripheralApi:reconnet()
 	if love.timer.getTime() - lastReconnectTime > self.reconnectCooldown then
 		lastReconnectTime = love.timer.getTime()
@@ -240,10 +277,12 @@ end
 ---Self explanatory.
 function PeripheralApi:rebootRemote()
 	--Halt the robot (check if it's moving and if so cancel all move commands.) then reboot.
-	if AppData.CAN_REBOOT then
+	if AppData.CAN_REBOOT_REMOTE then
+		self:armStop()
+		self:wheelStop()
 		os.execute("reboot")
 	else
-		print("Rebooting is currently disabled! To enable: Access <prj_loc>/remote/src/AppData.lua and change CAN_REBOOT to \"true\".")
+		print("Rebooting is currently disabled! To enable: Access <prj_loc>/remote/src/AppData.lua and change CAN_REBOOT_REMOTE to \"true\".")
 	end
 end
 
@@ -275,22 +314,22 @@ function PeripheralApi:stopWheel()
 	return self:_sendCmd("wheel_stop")
 end
 
-function PeripheralApi:moveWheel(dir, deg)
-	deg = cleanUpWheelArg(self, deg)
-	if not deg then return false end
+function PeripheralApi:moveWheel(dir, angle)
+	angle = cleanUpWheelArg(self, angle)
+	if not angle then return false end
 	local cmdName = "wheel_" .. dir
-	return self:_sendCmd(cmdName, deg)
+	return self:_sendCmd(cmdName, angle)
 end
 
 ------------------------------ API - Movement - Cutters ------------------------------
 ---Unlike the getters/setters below; those actually set the position of the cutters to their arg.
 --		These are not some default-y or stateful setup.
 -- @param deg=0						#number		;	Angle of the cutter-worm.
-function PeripheralApi:setCutterWormAngle(deg)
-	deg = deg or 0
-	deg = lume.clamp(deg, self.CUTTER_WORM_ANGLE_MIN, self.CUTTER_WORM_ANGLE_MAX)
-	self.cutterWormAngle = deg
-	self:_sendCmd("c_worm_set", deg)
+function PeripheralApi:setCutterWormAngle(angle)
+	angle = angle or 0
+	angle = lume.clamp(angle, self.CUTTER_WORM_ANGLE_MIN, self.CUTTER_WORM_ANGLE_MAX)
+	self.cutterWormAngle = angle
+	self:_sendCmd("c_worm_set", angle)
 end
 function PeripheralApi:getCutterWormAngle()
 	return self.cutterWormAngle
@@ -316,6 +355,7 @@ end
 function PeripheralApi:setArmSpeed(speed)
 	self.armSpeed = lume.clamp(speed, self.ARM_SPEED_MIN, self.ARM_SPEED_MAX)
 end
+
 function PeripheralApi:getArmSpeed()
 	return self.armSpeed
 end
@@ -324,6 +364,7 @@ end
 function PeripheralApi:setWheelRotAmount(deg)
 	self.wheelRotAmount = lume.clamp(deg, self.WHEEL_ROT_AMOUNT_MIN,self.WHEEL_ROT_AMOUNT_MAX)
 end
+
 function PeripheralApi:getWheelRotAmount()
 	return self.wheelRotAmount
 end

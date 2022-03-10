@@ -18,7 +18,8 @@ local AppData = {
 	PINGS_BEFORE_TIMEOUT = 3,
 	
 	--Priviliages
-	CAN_REBOOT = false,
+	CAN_REBOOT_REMOTE = false,
+	CAN_REBOOT_ROBOT = false,
 }
 
 function AppData:getVersionString()

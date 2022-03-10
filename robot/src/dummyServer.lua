@@ -29,27 +29,12 @@ local CMDS = {
 
 ------------------------------ Upvalues ------------------------------
 local server
------------------------------- Helpers ------------------------------
-local function printArgs(...)
-	local args = {...}
-	print("===============")
-	for k, v in ipairs(args) do
-		if type(v) == 'table' then
-			io.write(string.format("%d\t{%s}\n", k, table.concat(v, ", ")))
-		else
-			print(k, v) 
-		end
-	end
-	print("===============")
-end
 
 ------------------------------ Setup ------------------------------
 local ip = "*"
 local port = AppData.port
 server = sock.newServer("*", port)
 
-local cutterWormAngle = 0
-local cutterWheelAngle = 0
 
 ------------------------------ Core API ------------------------------
 local function load()
@@ -114,12 +99,10 @@ end)
 --Cutter
 server:on("c_worm_set", function(angle)
 	print(CMDS.c_worm_set.code, angle)
-	cutterWormAngle = angle
 end)
 
 server:on("c_wheel_set", function(angle)
 	print(CMDS.c_wheel_set.code, angle)
-	cutterWheelAngle = angle
 end)
 
 --Sensor
