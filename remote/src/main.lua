@@ -1,6 +1,7 @@
 local Slab = require "libs.Slab"
 
 local PeripheralApi = require "PeripheralApi"
+local UdpApi = require "UdpApi"
 
 local lovebird = require "libs.lovebird"
 lovebird.update()					--To fix lovebird missing prints before the first love.update is called.
@@ -14,11 +15,23 @@ function love.load(args)
 	_G.Display = Display
 end
 
-
+local dur = 3
+local lastTime = 0
 function love.update(dt)
-	lovebird.update()
+	lovebird.update(dt)
+	UdpApi:update(dt)
+
 	Slab.Update(dt)
 	Display:update(dt)
+
+	
+	
+--	if love.timer.getTime() - lastTime > dur then
+--		lastTime = love.timer.getTime() 
+--		if UdpApi.client:isConnected() then
+--			UdpApi.client:send("hello")
+--		end
+--	end
 end
 
 function love.draw()

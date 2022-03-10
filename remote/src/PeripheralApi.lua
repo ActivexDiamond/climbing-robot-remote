@@ -52,6 +52,18 @@ local AppData = require "AppData"
 			
 		members:
 			all class members are always protected. I only ever access them using get/set.
+			
+	Single-quotes are used for strings used as enums or constant-codes.
+	Double-quotes are used for all other strings.
+	
+	Indentation: tabs
+	Tab: 4-spaces
+	Comments: 
+		Punctuated.
+		No leading-space.
+		Long-lines are used as titled seprators for sections.
+		Short-lines are used as title seperators for sub-sections.
+	
 --]]
 
 ------------------------------ Heleprs ------------------------------
@@ -80,18 +92,24 @@ local PeripheralApi = class("PeripheralApi")
 --Note: This class is a singleton.
 function PeripheralApi:initialize()
 	--UDP Related
-	self.return_timeout = 3000		--in ms
+	self.return_timeout = 3		--in ms
+	self.reconnectCooldown = 2
 
 	--TODO: Change these to more sensible defaults.
 	--Defaults - Speeds.
 	self.armSpeed = 135
 	self.wheelRotAmount = 155
-	--Defaults - Angles.
+	
+	--Defaults - Cutters
 	self.cutterWormAngle = 0
 	self.cutterWheelAngle = 0
 end
 
+
 ------------------------------ Commands ------------------------------
+---Note: The "code" field is NOT used by the remote in any way,
+--	and it is not even aware of it's existence.
+--It is only here to make debugging easier.
 PeripheralApi.cmds = {
 	arm_stop =					{code = "AS",		args = 0, rt = false},
 	arm_forward =				{code = "AF",		args = 1, rt = false},
@@ -106,8 +124,8 @@ PeripheralApi.cmds = {
 	wheel_right =				{code = "WR",		args = 1, rt = false},
 	
 	c_worm_set =				{code = "CWorm",	args = 1, rt = false},
-	c_worm_set =				{code = "CWheel",	args = 1, rt = false},
-	
+	c_wheel_set =				{code = "CWheel",	args = 1, rt = false},
+
 	sys_reboot =				{code = "SR",		args = 0, rt = false},
 	
 	sensor_ultrasonic_left = 	{code = "UL",		args = 0, rt = true},
@@ -122,25 +140,25 @@ function PeripheralApi:_sendCmd(cmdName, ...)
 	if not cmd then
 		local errStr = "Tried to execute [%s] and failed as command is invalid!" 
 		print(errStr:format(cmdName))
-		return false
+		return false, "invalid-cmd"
 	end
 	if cmd.args ~= #args then
 		local errStr = "Tried to execute [%s] with [%d args] and failed as command requires [%d args]"
 		print(errStr:format(cmdName, #args, cmd.args))
-		return false
+		return false, "improper-args"
 	end
 	
-	print("Exeucting command:", cmd.code, table.concat(args))
+	print("Exeucting command:", cmdName, table.concat(args))
 	--Yes, this could be changes to "=< 1" -> "unpack",
 	--	but this communicates the logic more cleanly.
 	if cmd.args == 0 then
-		UdpApi:send(cmd.code)
+		UdpApi:send(cmdName)
 	elseif cmd.args == 1 then
 		--Commands with a single arg, get it sent in as is.
-		UdpApi:send(cmd.code, unpack(args))
+		UdpApi:send(cmdName, unpack(args))
 	else
 		--Commands with a more than 1 arg, get it sent in bunbled up in a table.
-		UdpApi:send(cmd.code, args)
+		UdpApi:send(cmdName, args)
 	end
 	
 	if cmd.rt then
@@ -148,8 +166,6 @@ function PeripheralApi:_sendCmd(cmdName, ...)
 	else
 		return nil, "got-nil: Command has no return value. It is running as expected."
 	end
-	
-	return true	
 end
 ------------------------------ API - Hardware Constants ------------------------------
 --Speed CLamps
@@ -172,7 +188,7 @@ PeripheralApi.CUTTER_WHEEL_ANGLE_MAX = 10
 -- @param y						#number		;	Screen-coord to start drawing at.
 -- @param w						#number		;	Resolution in pixels.
 -- @param h						#number		;	Resolution in pixels.
--- @param fps=maxxed-out		#number		; 	fps of the video. Should provide a default. Heck, you can skip implementing this one if you want.
+-- @param fps=maxed-out		#number		; 	fps of the video. Should provide a default. Heck, you can skip implementing this one if you want.
 function PeripheralApi:drawCnnVideoStream(x, y, w, h, fps)
 	--TODO: Implement.
 end
@@ -201,8 +217,15 @@ end
 ---Checks if the remote is currently connected to the robot. Returns a bool, not the delay.
 -- @return 						#bool		;	Whether the robot is connected or not.
 function PeripheralApi:ping()
-	--TODO: Implement.
-	return not love.keyboard.isDown('p')
+	return UdpApi:isConnected()
+end
+
+local lastReconnectTime = 0
+function PeripheralApi:reconnet()
+	if love.timer.getTime() - lastReconnectTime > self.reconnectCooldown then
+		lastReconnectTime = love.timer.getTime()
+		UdpApi:reconnect()
+	end
 end
 
 ------------------------------ API - System ------------------------------
@@ -266,14 +289,8 @@ end
 function PeripheralApi:setCutterWormAngle(deg)
 	deg = deg or 0
 	deg = lume.clamp(deg, self.CUTTER_WORM_ANGLE_MIN, self.CUTTER_WORM_ANGLE_MAX)
-	--Note: This variable is only kept so that the getter works which is only used
-	--		to display this value to the user in the GUI. The robot does not actually allow
-	--		getting the cutter angle.
-	if self:_sendCmd("c_worm_set", deg) then
-		self.cutterWormAngle = deg
-		return true
-	end
-	return false
+	self.cutterWormAngle = deg
+	self:_sendCmd("c_worm_set", deg)
 end
 function PeripheralApi:getCutterWormAngle()
 	return self.cutterWormAngle
@@ -284,14 +301,8 @@ end
 function PeripheralApi:setCutterWheelAngle(deg)
 	deg = deg or 0
 	deg = lume.clamp(deg, self.CUTTER_WHEEL_ANGLE_MIN, self.CUTTER_WHEEL_ANGLE_MAX)
-	--Note: This variable is only kept so that the getter works which is only used
-	--		to display this value to the user in the GUI. The robot does not actually allow
-	--		getting the cutter angle.
-	if self:_sendCmd("c_wheel_set", deg) then
-		self.cutterWheelAngle = deg
-		return true
-	end
-	return false
+	self.cutterWheelAngle = deg
+	self:_sendCmd("c_wheel_set", deg)
 end
 function PeripheralApi:getCutterWheelAngle()
 	return self.cutterWheelAngle
@@ -317,5 +328,4 @@ function PeripheralApi:getWheelRotAmount()
 	return self.wheelRotAmount
 end
 
---You know how the robot works. Do you think I missed anything?
 return PeripheralApi()

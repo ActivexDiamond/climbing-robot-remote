@@ -11,9 +11,11 @@ local AppData = {
 	--Directories
 	ASSET_DIR = "assets/",
 	
-	--client_ip = "localhost",
-	server_ip = "localhost",
-	port = "9000",
+	--Networking Related
+	serverIp = "localhost",
+	port = 9000,
+	PING_INTERVAL = 1,
+	PINGS_BEFORE_TIMEOUT = 3,
 	
 	--Priviliages
 	CAN_REBOOT = false,

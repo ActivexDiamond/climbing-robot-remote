@@ -10,6 +10,7 @@ local AppData = require "AppData"
 local UdpApi = class("UdpApi")
 --Note: This class is a singleton.
 function UdpApi:initialize()
+	self.lastPing = 0
 	self:reloadPeer()
 end
 
@@ -17,19 +18,38 @@ end
 function UdpApi:update(dt)
 	self.rtVal = nil		--Clear any old unclaimed rtVals.
 	self.client:update(dt)
+	local timeout = AppData.PING_INTERVAL * AppData.PINGS_BEFORE_TIMEOUT
+	if not self.client:isConnecting() and
+			love.timer.getTime() - self.lastPing > timeout then
+		self.client:disconnectNow()
+	end
 end
 
 ------------------------------ API ------------------------------
 function UdpApi:reloadPeer()
-	self.ip = AppData.server_ip
+	self.serverIp = AppData.serverIp
 	self.port = AppData.port
-	self.target = self.ip .. ":" .. self.port
+	self.timeout = AppData.CONNECTION_TIMEOUT
 	self:connect()
+	self.lastPing = love.timer.getTime()
 end
 
 function UdpApi:connect()
-	self.client = sock.newClient(self.ip, self.port)
+	self.client = sock.newClient(self.serverIp, self.port)
+	self.client:setTimeout(self.timeout)
 	self:_injectEvents()
+	self.client:connect()
+end
+
+function UdpApi:reconnect()
+	if not (self.client:isConnected() or self.client:isConnecting()) then
+		print("Reconnecting")
+		self.client:connect()
+	end	
+end
+
+function UdpApi:isConnected()
+	return self.client:isConnected()
 end
 
 --- Attempt to fetch the rtVal produced by the last event sent.
@@ -67,14 +87,19 @@ end
 UdpApi.events = {}
 
 function UdpApi.events:connect()
-	print("Successfully established a connection to: ", self.ip, self.port)
+	self.lastPing = love.timer.getTime()
+	print("Successfully established a connection to: ", self.serverIp, self.port)
 end
 
 function UdpApi.events:disconnect()
 	print("Disconnected from the server.")
 end
 
-function UdpApi.events:onReturn(val)
+function UdpApi.events:ping(timeStamp)
+	self.lastPing = love.timer.getTime()
+end
+
+function UdpApi.events:rt(val)
 	self.rtVal = val
 end
 

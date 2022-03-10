@@ -1,5 +1,6 @@
 local class = require "libs.middleclass"
 local Slab = require "libs.Slab"
+local socket = require "socket"
 
 local PeripheralApi = require "PeripheralApi"
 local AppData = require "AppData"
@@ -22,6 +23,9 @@ end
 ------------------------------ Constructor ------------------------------
 local MainScene = class("MainScene", State)
 function MainScene:initialize()
+	--Fetch Client Ip
+	self.clientIp = socket.dns.toip(socket.dns.gethostname())
+	
 	--Offline Label Animation
 	self.dotTimeDur = 0.3
 	self.dotsLen = 7
@@ -87,16 +91,20 @@ function MainScene:update(dt)
 	local prjNameXPos = window.W - getTextW(AppData.PROJECT_NAME) - 10
 	Slab.SetCursorPos(prjNameXPos, 0)
 	Slab.Text(AppData.PROJECT_NAME)
+	Slab.Text("Client IP: " .. self.clientIp)
+	Slab.Text("Server IP: " .. AppData.serverIp)
+	Slab.Text("Port: " .. AppData.port)
 	
 	--Status
-	local statusStr = PeripheralApi:ping() and "Robot Status: live" or "Robot Status: offline"
+	local statusStr = PeripheralApi:ping() and "Robot Status: online" or "Robot Status: offline"
 	local statusXPos = window.W / 2 - getTextW(statusStr) / 2
 	local statusYPos = getTextH(statusStr) * 3
-	Slab.SetCursorPos(statusXPos, statusYPos)
+	--Slab.SetCursorPos(statusXPos, statusYPos)
+	Slab.NewLine()
 	Slab.Text(statusStr)
 	
 	--Offline Label
-	Slab.SetCursorPos(statusXPos, statusYPos + getTextH(statusStr))
+	--Slab.SetCursorPos(statusXPos, statusYPos + getTextH(statusStr))
 	if not PeripheralApi:ping() then
 		Slab.Text("Reconnecting." .. self.dots)
 		self.dotTime = self.dotTime + dt
@@ -157,6 +165,8 @@ function MainScene:update(dt)
 	end
 	
 	Slab.EndWindow()
+	
+	PeripheralApi:reconnet()		--Will get ignored if client is already connected.
 end
 
 ------------------------------ Getters / Setters ------------------------------
