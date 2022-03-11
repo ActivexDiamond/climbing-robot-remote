@@ -1,5 +1,3 @@
-local Slab = require "libs.Slab"
-
 --Guard-clause for when running on a dev-machine, not an actual Pi,
 --Periphery will not be installed and all calls to it's API will be
 --	forwarded to blank versions.
@@ -41,8 +39,11 @@ end
 local fps = 5
 
 --Pins
-local trig = Gpio("GPIO.24", 'out')
-local echo = Gpio("GPIO.25", 'in')
+local trig = Gpio(24, 'out')
+local echo = Gpio(25, 'in')
+
+--local trig = Gpio("GPIO.24", 'out')
+--local echo = Gpio("GPIO.25", 'in')
 
 --API
 local function readUltrasonic()
@@ -67,20 +68,10 @@ end
 local lastTime = 0
 
 ------------------------------ Core API ------------------------------
-function love.load()
-	Slab.SetINIStatePath(nil)
-	Slab.Initialize()
-end
-
 function love.update(dt)
-	Slab.Update(dt)
 	if love.timer.getTime() - lastTime > 1000/fps then
 		readUltrasonic()
 		lastTime = love.timer.getTime()
 	end
 end
 
-function love.draw()
-	local g2d = love.graphics
-	Slab.Draw()
-end
