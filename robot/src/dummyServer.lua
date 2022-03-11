@@ -112,8 +112,8 @@ end)
 server:on("sensor_ultrasonic_right", function(angle)
 	print(CMDS.sensor_ultrasonic_right.code, angle)
 end)
-server:on("sensor_gyro_is_fallen", function(angle)
-	print(CMDS.sensor_gyro_is_fallen.code, angle)
+server:on("sensor_gyroscope_is_fallen", function(angle)
+	print(CMDS.sensor_gyroscope_is_fallen.code, angle)
 end)
 
 

@@ -2,12 +2,74 @@ local class = require "libs.middleclass"
 
 local AppData = require "AppData"
 
+--Guard-clause for when running on a dev-machine, not an actual Pi,
+--Periphery will not be installed and all calls to it's API will be
+--	forwarded to blank versions.
+--This facilitates development on non-Pi machines. 
+local Serial, Gpio
+do
+	local succ, msg = pcall(require, "periphery")
+	if succ then
+		Serial = require("periphery").Serial
+		Gpio = require("periphery").GPIO
+	else
+		Serial = require("dummyPeriphery").Serial
+		Gpio = require("dummyPeriphery").GPIO
+	end
+end
+
+------------------------------ Constructor ------------------------------
+local function microsecondSleep(ms)
+	love.timer.sleep(ms / 1e6)
+end
+
+local function readPulseLength(pin)
+	local startTime, endTime
+	local getTime = love.timer.getTime		--Localize to optimize call.
+	--Read the length of the pulse from when the pin goes high,
+	--	till when it comes back low.
+	while not pin:read() do
+		startTime = getTime()
+	end
+	while pin:read() do
+		endTime = getTime()
+	end
+	return endTime - getTime
+end
+
 ------------------------------ Constructor ------------------------------
 local PiApi = class("PiApi")
 --Note: This class is a singleton.
 function PiApi:initialize()
 	--TODO: Implement.
 end
+
+------------------------------ Commands ------------------------------
+PiApi.hardware = {
+	pins = {
+		ultrasonicLeftTrig = 	"GPIO.24",
+		ultrasonicLeftEcho = 	"GPIO.25",
+		 
+		ultrasonicRightTrig = 	"GPIO.26",
+		ultrasonicRightEcho = 	"GPIO.27",
+		
+		gyroscopeSda = 			"SDA.0",
+		gyroscopeScl = 			"SDA.1",
+	},
+	
+	modules = {
+		ultrasonic =	{moduleTag = "HC-SR04",											count = 2,		groups = {'left',	'right'}		},
+		gyroscope =		{moduleTag = "MPU9265",											count = 1,		groups = {}							},
+		nano =			{moduleTag = "Arduino Nano ATMega368 (old bootloader)",			count = 3,		groups = {'usb',	'nc',	'nc'}	},
+		},
+
+	serial = {
+		port = "dev/ttyUSB0",
+		baudrate = 9600,
+		eol = "\n",
+		eoc = ";",
+	},
+}
 
 ------------------------------ Commands ------------------------------
 ---[cmds]					#table
@@ -60,7 +122,7 @@ PiApi.cmds = {
 	
 	sensor_ultrasonic_left = 	{code = "UL",		args = 0, rt = true},
 	sensor_ultrasonic_right =	{code = "UR",		args = 0, rt = true},
-	sensor_gyro_is_fallen =		{code = "GF",		args = 0, rt = true},
+	sensor_gyroscope_is_fallen ={code = "GF",		args = 0, rt = true},
 }
 
 ------------------------------ Internals ------------------------------
@@ -68,34 +130,112 @@ PiApi.cmds = {
 --Calling serial methods before this may or may not raise an error,
 --	but is guranteed to fail.
 function PiApi:_initSerial()
-	--TODO: Implement.
+	local cfg = self.hardware.serial
+	self.serial = Serial(cfg.port, cfg.baudrate)
+	self.serial.eoc = cfg.eoc
 end
 
 ---Recives a valid command name, converts it to it's respective code,
 --	appends terminating characters and then transmits it to the Nano.
 --Note: No validation is done on the cmdName, must be done by the user.
-function PiApi:_transmitSerialCmd(cmdName)
-	--TODO: Implement.
+function PiApi:_transmitSerialCmd(cmdName, ...)
+	local args = {...}
+	local cmd = self.cmds[cmdName]
+	local str = cmd.code .. self.serial.eoc
+	for i = 1, cmd.args do
+		str = args[i] .. self.serial.eoc
+	end
+	print("Writing command to serial: " .. str)
+	self.serial:write(str)	
 end
 
 ---Sets up GPIO state for all pins in active use.
 function PiApi:_initGpio()
-	--TODO: Implement.
+	local pins = self.hardware.pins
+	self.gpio = {
+		ultrasonic = {
+			left = {
+				trig = Gpio(pins.ultrasonicLeftTrig, 'out'),
+				echo = Gpio(pins.ultrasonicLeftEcho, 'in'),
+			},
+			right = {
+				trig = Gpio(pins.ultrasonicRightTrig, 'out'),
+				echo = Gpio(pins.ultrasonicRightEcho, 'in'),
+			},
+		},
+	}
 end
 
 ---Returns the distance-value of an ultrasonic sensor. Module in use: HC-SR04
 -- @param target					#string		;	One of 'left' or 'right'.
 -- @return							#number		;	Distance in centimeters.
 function PiApi:_readUltrasonic(target)
-	--TODO: Implement.
+	--Grab the correct target.
+	local trig = self.gpio.ultrasonic[target].trig
+	local echo = self.gpio.ultrasonic[target].echo
+	--Clear out the trigger pin, giving it 2ms to do so.
+	trig:write(false)
+	microsecondSleep(2)
+	--Send a 10ms long pulse to the trgger pin.
+	trig:write(true)
+	microsecondSleep(10)
+	trig:write(false)
+	
+	--Read the length of the response pulse.
+	local len = readPulseLength(echo)
+	--Speed of sound in air, in centimeters, divided be 2, as the wave must travel to and fro.
+	local dist = len * 0.034 / 2
+	local str = string.format("Distance to [%s] ultrasonic is %fcm.",
+			target, dist)
+	print(str)
+	--TODO: Test this out on real hardware and confirm the results.
 end
 
 ---Returns the raw-reading of the gyroscope value. Module in use: MPU9265
-function PiApi:_readGyro()
+function PiApi:_readGyroscope()
 	--TODO: Implement.
 end
 
------------------------------- API - Sys ------------------------------
+------------------------------ API - System Specs ------------------------------
+function PiApi:getCpuTemp()
+	--TODO: Implement
+	return "-1'C"
+end
+
+function PiApi:getGpuTemp()
+	--TODO: Implement
+	return "-1'C"
+end
+
+function PiApi:getCpuLoad()
+	--TODO: Implement
+	return "-1%"
+end
+
+function PiApi:getGpuLoad()
+	--TODO: Implement
+	return "-1%"
+end
+
+function PiApi:getRamUsage()
+	--TODO: Implement
+	return "0GB/0GB"
+end
+
+function PiApi:getDiskUsage()
+	--TODO: Implement
+	return "0GB/0GB"
+end
+
+------------------------------ API - System ------------------------------
+---Quits this Love program.
+-- @return						#bool		;	Always returns false, but if the quit event propgated fully program would simply exit before this returns.
+function PiApi:quit()
+	--Any clean-up or state-saving code would go here.
+	love.event.quit()
+	return false	--Would only ever be returned if the quit event was cancelled.
+end
+
 function PiApi:reboot()
 	--Halt the robot (check if it's moving and if so cancel all move commands.) then reboot.
 	if AppData.CAN_REBOOT_ROBOT then
@@ -115,26 +255,22 @@ end
 
 ---Set the arm to move forwards at "speed" velocity.
 function PiApi:armForward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_forward.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.arm_forward.code, speed)
 end
 
 ---Set the arm to move backwards at "speed" velocity.
 function PiApi:armBackward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_backward.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.arm_backward.code, speed)
 end
 
 ---Set the arm to move upwards at "speed" velocity.
 function PiApi:armUp(speed)
-	self:_transmitSerialCmd(self.cmds.arm_up.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.arm_up.code, speed)
 end
 
 ---Set the arm to move downwards at "speed" velocity.
 function PiApi:armDown(speed)
-	self:_transmitSerialCmd(self.cmds.arm_down.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.arm_down.code, speed)
 end
 
 ------------------------------ API - Wheel ------------------------------
@@ -145,39 +281,33 @@ end
 
 ---Move the chasis forwards at "speed" velocity.
 function PiApi:wheelForward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_forward.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_forward.code, speed)
 end
 
 ---Move the chasis backwards at "speed" velocity.
 function PiApi:wheelBackward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_backward.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_backward.code, speed)
 end
 
 ---Turn the chasis left at "speed" velocity.
 function PiApi:wheelleft(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_left.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_left.code, speed)
 end
 
 ---Turn the chasis right at "speed" velocity.
 function PiApi:wheelright(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_right.code)
-	self:_transmitSerialCmd(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_right.code, speed)
 end
 
 -------------------------------- API - Cutters ------------------------------
 ---Set the angle of the cutter worm to "angle".
 function PiApi:setCutterWormAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_worm_set.code)
-	self:_transmitSerialCmd(angle)	
+	self:_transmitSerialCmd(self.cmds.c_worm_set.code, angle)
 end
 
 ---Set the angle of the cutter wheel to "angle".
 function PiApi:setCutterWheelAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_wheel_set.code)
-	self:_transmitSerialCmd(angle)	
+	self:_transmitSerialCmd(self.cmds.c_wheel_set.code, angle)
 end
 
 -------------------------------- API - Sensors ------------------------------
@@ -196,7 +326,7 @@ end
 ---Returns whether the robot has tipped over too far to be able to manuever or not.
 -- @return						#bool		;	Whether the robot can no longer manuever or not.
 function PiApi:isFallen()
-	local data = self:readGyro()
+	local data = self:readGyroscope()
 	--TODO: Implement.
 end
 

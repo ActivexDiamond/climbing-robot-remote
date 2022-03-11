@@ -167,7 +167,7 @@ PeripheralApi.cmds = {
 	
 	sensor_ultrasonic_left = 	{code = "UL",		args = 0, rt = true},
 	sensor_ultrasonic_right =	{code = "UR",		args = 0, rt = true},
-	sensor_gyro_is_fallen =		{code = "GF",		args = 0, rt = true},
+	sensor_gyroscope_is_fallen ={code = "GF",		args = 0, rt = true},
 }
 
 ------------------------------ Internals ------------------------------
@@ -236,7 +236,7 @@ end
 -- Note: I'm guessing you either hardcode values into this, or slap some param in :init(config) to allow some tweaking for this?
 -- @return 						#bool		;	Whether it has fallen.
 function PeripheralApi:isFallen()
-	return self:_sendCmd("sensor_gyro_is_fallen")
+	return self:_sendCmd("sensor_gyroscop_is_fallen")
 end
 
 ---Returns the distance from the left ultrasonic to the nearest object. In centimeters.

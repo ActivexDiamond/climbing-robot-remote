@@ -24,7 +24,7 @@ end
 local MainScene = class("MainScene", State)
 function MainScene:initialize()
 	--Fetch Client Ip
-	self.clientIp = socket.dns.toip(socket.dns.gethostname())
+	self.machineIp = socket.dns.toip(socket.dns.gethostname())
 	
 	--Offline Label Animation
 	self.dotTimeDur = 0.3
@@ -91,8 +91,8 @@ function MainScene:update(dt)
 	local prjNameXPos = window.W - getTextW(AppData.PROJECT_NAME) - 10
 	Slab.SetCursorPos(prjNameXPos, 0)
 	Slab.Text(AppData.PROJECT_NAME)
-	Slab.Text("Client IP: " .. self.clientIp)
-	Slab.Text("Server IP: " .. AppData.serverIp)
+	Slab.Text("Machine (Client) IP: " .. self.machineIp)
+	Slab.Text("Target (Server) IP: " .. AppData.targetIp)
 	Slab.Text("Port: " .. AppData.port)
 	
 	--Status

@@ -133,7 +133,7 @@ function UdpApi.events:sensor_ultrasonic_right()
 	PiApi:readRightUltrasonic()
 end
 
-function UdpApi.events:sensor_gyro_is_fallen()
+function UdpApi.events:sensor_gyroscope_is_fallen()
 	PiApi:isFallen()
 end
 
