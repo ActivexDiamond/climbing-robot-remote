@@ -20,14 +20,17 @@ local function microsecondSleep(ms)
 end
 
 local function readPulseLength(pin)
-	local startTime, endTime
+	local startTime = 0 
+	local endTime = 0
 	local getTime = love.timer.getTime		--Localize to optimize call.
 	--Read the length of the pulse from when the pin goes high,
 	--	till when it comes back low.
 	while not pin:read() do
+		print("startTime: " .. getTime())
 		startTime = getTime()
 	end
 	while pin:read() do
+		print("endTime: " .. getTime())
 		endTime = getTime()
 	end
 	return endTime - startTime
