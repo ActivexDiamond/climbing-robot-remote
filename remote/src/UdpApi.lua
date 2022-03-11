@@ -88,7 +88,7 @@ UdpApi.events = {}
 
 function UdpApi.events:connect()
 	self.lastPing = love.timer.getTime()
-	print("Successfully established a connection to: ", self.serverIp, self.port)
+	print("Successfully established a connection to: ", self.targetIp, self.port)
 end
 
 function UdpApi.events:disconnect()

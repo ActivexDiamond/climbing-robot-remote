@@ -16,7 +16,7 @@ local AppData = {
 	targetIp = "192.168.0.143",
 	port = 9000,
 	PING_INTERVAL = 2,
-	PINGS_BEFORE_TIMEOUT = 3,
+	PINGS_BEFORE_TIMEOUT = 4,
 	
 	--Priviliages
 	CAN_REBOOT_REMOTE = false,
