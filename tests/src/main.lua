@@ -30,7 +30,7 @@ local function readPulseLength(pin)
 	while pin:read() do
 		endTime = getTime()
 	end
-	return endTime - getTime
+	return endTime - startTime
 end
 
 
