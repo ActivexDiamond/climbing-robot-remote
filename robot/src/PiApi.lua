@@ -18,7 +18,7 @@ do
 	end
 end
 
------------------------------- Constructor ------------------------------
+------------------------------ Helpers ------------------------------
 local function microsecondSleep(ms)
 	love.timer.sleep(ms / 1e6)
 end

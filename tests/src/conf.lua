@@ -2,14 +2,14 @@ function love.conf(t)
   -- Commented out defaults shown below.
   -- See https://www.love2d.org/wiki/Config_Files for more information.
 
-   t.identity = "robot_server"                    -- The name of the save directory (string)
+   t.identity = "robot_tests"                    -- The name of the save directory (string)
    t.version = "11.1"                -- The L�VE version this game was made for (string)
   -- t.console = false                   -- Attach a console (boolean, Windows only)
    t.accelerometerjoystick = false      -- Enable the accelerometer on iOS and Android by exposing it as a Joystick (boolean)
   -- t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean) 
   -- t.gammacorrect = false              -- Enable gamma-correct rendering, when supported by the system (boolean)
 
-   t.window.title = "Robot Server"         -- The window title (string)
+   t.window.title = "Robot Tests"         -- The window title (string)
   -- t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string)
    t.window.height = 320                 -- The window height (number)
    t.window.width = 480                  -- The window width (number)
