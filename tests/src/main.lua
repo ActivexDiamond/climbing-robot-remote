@@ -69,16 +69,20 @@ local echo = Gpio(37, 'in')
 local function readUltrasonic()
 	--Clear out the trigger pin, giving it 2ms to do so.
 	trig:write(false)
-	microsecondSleep(2)
+	love.timer.sleep(2)
 	--Send a 10ms long pulse to the trgger pin.
 	trig:write(true)
-	microsecondSleep(10)
+	love.timer.sleep(0.00001) 
 	trig:write(false)
 	
 	--Read the length of the response pulse.
 	local len = readPulseLength(echo)
 	--Speed of sound in air, in centimeters, divided be 2, as the wave must travel to and fro.
-	local dist = len * 0.034 / 2
+	
+	--local dist = len * 0.034 / 2
+	local dist = len * 17150
+	--distance = round(pulse_duration * 17150, 2) 
+	
 	local str = string.format("Distance to ultrasonic is %fcm.", dist)
 	print(str)
 	--TODO: Test this out on real hardware and confirm the results.
