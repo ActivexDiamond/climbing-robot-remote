@@ -10,6 +10,8 @@ function love.load()
 	--dummyServer.load()
 end
 
+local fps = 5
+local lastTime = 0
 function love.update(dt)
 	Slab.Update(dt)
 

@@ -15,20 +15,39 @@ do
 end
 
 ------------------------------ Helpers ------------------------------
+local function TimeoutTimer(timeout)
+	return {
+		timeout = timeout,
+		startTime = love.timer.getTime(),
+		
+		shouldAbort = function(self)
+			return love.timer.getTime() - self.startTime > self.timeout
+		end,
+		reset = function(self)
+			self.startTime = love.timer.getTime()
+		end,
+	}
+end
+
 local function microsecondSleep(ms)
 	love.timer.sleep(ms / 1e6)
 end
 
 local function readPulseLength(pin)
+	local timeoutTimer = TimeoutTimer(3)
+	
 	local startTime = 0 
 	local endTime = 0
 	local getTime = love.timer.getTime		--Localize to optimize call.
 	--Read the length of the pulse from when the pin goes high,
 	--	till when it comes back low.
 	while not pin:read() do
+		if timeoutTimer:shouldAbort() then break end
 		startTime = getTime()
 	end
+	timeoutTimer:reset()
 	while pin:read() do
+		if timeoutTimer:shouldAbort() then break end
 		endTime = getTime()
 	end
 	return endTime - startTime
