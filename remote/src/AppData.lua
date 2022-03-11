@@ -15,7 +15,7 @@ local AppData = {
 	openIp = "*",
 	targetIp = "192.168.0.143",
 	port = 9000,
-	PING_INTERVAL = 2,
+	PING_INTERVAL = 4,
 	PINGS_BEFORE_TIMEOUT = 4,
 	
 	--Priviliages
