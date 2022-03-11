@@ -12,7 +12,7 @@ end
 
 function love.update(dt)
 	Slab.Update(dt)
-	
+
 	--dummyServer.update(dt)
 	Display:update(dt)
 end

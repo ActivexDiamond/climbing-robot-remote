@@ -76,7 +76,7 @@ function love.load()
 end
 
 function love.update(dt)
-	if love.timer.getTime() - lastTime > 1000/fps then
+	if love.timer.getTime() - lastTime > 1/fps then
 		print("Attempting to read ultrasonic.")
 		readUltrasonic()
 		lastTime = love.timer.getTime()
