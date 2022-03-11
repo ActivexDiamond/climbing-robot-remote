@@ -68,8 +68,13 @@ end
 local lastTime = 0
 
 ------------------------------ Core API ------------------------------
+function love.load()
+	print("Began running Climbing Robot hardware configuration tests (manual).")
+end
+
 function love.update(dt)
 	if love.timer.getTime() - lastTime > 1000/fps then
+		print("Attempting to read ultrasonic.")
 		readUltrasonic()
 		lastTime = love.timer.getTime()
 	end
