@@ -139,6 +139,7 @@ end
 --	appends terminating characters and then transmits it to the Nano.
 --Note: No validation is done on the cmdName, must be done by the user.
 function PiApi:_transmitSerialCmd(cmdName, ...)
+	print(cmdName)
 	local args = {...}
 	local cmd = self.cmds[cmdName]
 	local str = cmd.code .. self.serial.eoc
@@ -250,64 +251,64 @@ end
 ------------------------------ API - Arm ------------------------------
 ---Halt all arm movement.
 function PiApi:armStop()
-	self:_transmitSerialCmd(self.cmds.arm_stop.code)
+	self:_transmitSerialCmd(self.cmds.arm_stop)
 end
 
 ---Set the arm to move forwards at "speed" velocity.
 function PiApi:armForward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_forward.code, speed)
+	self:_transmitSerialCmd(self.cmds.arm_forward, speed)
 end
 
 ---Set the arm to move backwards at "speed" velocity.
 function PiApi:armBackward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_backward.code, speed)
+	self:_transmitSerialCmd(self.cmds.arm_backward, speed)
 end
 
 ---Set the arm to move upwards at "speed" velocity.
 function PiApi:armUp(speed)
-	self:_transmitSerialCmd(self.cmds.arm_up.code, speed)
+	self:_transmitSerialCmd(self.cmds.arm_up, speed)
 end
 
 ---Set the arm to move downwards at "speed" velocity.
 function PiApi:armDown(speed)
-	self:_transmitSerialCmd(self.cmds.arm_down.code, speed)
+	self:_transmitSerialCmd(self.cmds.arm_down, speed)
 end
 
 ------------------------------ API - Wheel ------------------------------
 ---Halt all chasis (wheel) movement.
 function PiApi:wheelStop()
-	self:_transmitSerialCmd(self.cmds.wheel_stop.code)
+	self:_transmitSerialCmd(self.cmds.wheel_stop)
 end
 
 ---Move the chasis forwards at "speed" velocity.
 function PiApi:wheelForward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_forward.code, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_forward, speed)
 end
 
 ---Move the chasis backwards at "speed" velocity.
 function PiApi:wheelBackward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_backward.code, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_backward, speed)
 end
 
 ---Turn the chasis left at "speed" velocity.
 function PiApi:wheelleft(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_left.code, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_left, speed)
 end
 
 ---Turn the chasis right at "speed" velocity.
 function PiApi:wheelright(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_right.code, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_right, speed)
 end
 
 -------------------------------- API - Cutters ------------------------------
 ---Set the angle of the cutter worm to "angle".
 function PiApi:setCutterWormAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_worm_set.code, angle)
+	self:_transmitSerialCmd(self.cmds.c_worm_set, angle)
 end
 
 ---Set the angle of the cutter wheel to "angle".
 function PiApi:setCutterWheelAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_wheel_set.code, angle)
+	self:_transmitSerialCmd(self.cmds.c_wheel_set, angle)
 end
 
 -------------------------------- API - Sensors ------------------------------
