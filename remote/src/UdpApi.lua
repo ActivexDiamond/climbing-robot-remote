@@ -27,7 +27,7 @@ end
 
 ------------------------------ API ------------------------------
 function UdpApi:reloadPeer()
-	self.serverIp = AppData.serverIp
+	self.targetIp = AppData.targetIp
 	self.port = AppData.port
 	self.timeout = AppData.CONNECTION_TIMEOUT
 	self:connect()
@@ -35,7 +35,7 @@ function UdpApi:reloadPeer()
 end
 
 function UdpApi:connect()
-	self.client = sock.newClient(self.serverIp, self.port)
+	self.client = sock.newClient(self.targetIp, self.port)
 	self.client:setTimeout(self.timeout)
 	self:_injectEvents()
 	self.client:connect()

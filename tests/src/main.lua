@@ -35,6 +35,7 @@ end
 
 local function readPulseLength(pin)
 	local timeoutTimer = TimeoutTimer(3)
+	local failed = false
 	
 	local startTime = 0 
 	local endTime = 0
@@ -42,15 +43,21 @@ local function readPulseLength(pin)
 	--Read the length of the pulse from when the pin goes high,
 	--	till when it comes back low.
 	while not pin:read() do
-		if timeoutTimer:shouldAbort() then break end
+		if timeoutTimer:shouldAbort() then
+			failed = true
+			break 
+		end
 		startTime = getTime()
 	end
 	timeoutTimer:reset()
 	while pin:read() do
-		if timeoutTimer:shouldAbort() then break end
+		if timeoutTimer:shouldAbort() or failed then 
+			failed = true
+			break 
+		end
 		endTime = getTime()
 	end
-	return endTime - startTime
+	return failed and -1 or endTime - startTime
 end
 
 

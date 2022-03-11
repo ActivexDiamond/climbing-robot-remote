@@ -24,7 +24,15 @@ local Display = class("Display")
 function Display:initialize()
 	self.backgroundColor = {colorFromBytes(12, 1, 69)}
 	love.graphics.setBackgroundColor(self.backgroundColor)
-	self.machineIp = socket.dns.toip(socket.dns.gethostname())
+	--local succ, ip = pcall(os.execute, "ipconfig getifaddr en1")
+	local succ, handle = pcall(io.popen, "ipconfig getifaddr en1") 
+	if succ then
+		local ip = handle:read("*a"):sub(1, -2)
+		self.machineIp = ip
+		handle:close()
+	else
+		self.machineIp = "failed-to-fetch"
+	end
 end
 
 ------------------------------ Constants ------------------------------

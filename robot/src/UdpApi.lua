@@ -19,9 +19,10 @@ end
 
 ------------------------------ Internals ------------------------------
 function UdpApi:_initServer()
-	self.serverIp = "*"
+	self.openIp = AppData.openIp
 	self.port = AppData.port
-	self.server = sock.newServer(self.serverIp, self.port)
+	self.server = sock.newServer(self.openIp, self.port)
+	self:_injectEvents()
 end
 
 ------------------------------ Core API ------------------------------
@@ -44,7 +45,6 @@ end
 
 ------------------------------ Internals ------------------------------
 function UdpApi:_injectEvents()
-	
 	for ev, callback in pairs(self.events) do
 		self.server:on(ev, function(...) callback(self, ...) end)
 	end
@@ -62,7 +62,7 @@ function UdpApi.events:connect(msg, peer)
 	print(str) 
 end
 
-function UdpApi.events:connect(msg, peer)
+function UdpApi.events:disconnect(msg, peer)
 	local str = string.format("Client has disconnected! [client=%s]",
 			peerToString(peer))
 	print(str) 

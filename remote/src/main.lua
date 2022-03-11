@@ -1,3 +1,25 @@
+--[[
+local sock = require "libs.sock"
+
+local client = sock.newClient("localhost", 9000)
+
+client:on("connect", function()
+	print("Connected!")
+end)
+
+client:on("disconnect", function()
+	print("Disconnected!")
+end)
+
+client:connect()
+
+function love.update()
+	client:update()
+end
+
+--]]
+
+---[[
 local Slab = require "libs.Slab"
 
 local PeripheralApi = require "PeripheralApi"
@@ -39,6 +61,8 @@ function love.draw()
 	Slab.Draw()
 	Display:draw(g2d)
 end
+
+--]]
 
 --[[
 --			Test Cases
