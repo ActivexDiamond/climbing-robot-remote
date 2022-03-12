@@ -26,6 +26,7 @@ function m.GPIO(pin, dir)
 	function self:read()
 		local str = string.format("[dummyPeriphery/%s:read: ] hardcoded-true",
 				self.pin)
+		print(str)
 		return true
 	end
 	return self
