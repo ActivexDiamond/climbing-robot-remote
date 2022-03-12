@@ -96,6 +96,7 @@ function UdpApi.events:disconnect()
 end
 
 function UdpApi.events:ping(timeStamp)
+	print("Got ping!")
 	self.lastPing = love.timer.getTime()
 end
 

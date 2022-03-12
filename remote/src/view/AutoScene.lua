@@ -70,9 +70,9 @@ function AutoScene:update(dt)
 	Slab.BeginWindow(consoleWindow.id, consoleWindow)
 	Slab.PushFont(Display.fonts.ROBOTO_MONO_REGULAR)
 
-	
 	--Draw Console
 	Slab.Text(self.console:getContent())
+
 	Slab.PopFont()
 	Slab.EndWindow()
 end

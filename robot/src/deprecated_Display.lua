@@ -2,9 +2,14 @@ local class = require "libs.middleclass"
 local Slab = require "libs.Slab"
 local socket = require "socket"
 
+local ConsoleStringBuilder = require "libs.ConsoleStringBuilder"
 local PiApi = require "PiApi"
 
 local AppData = require "AppData"
+
+------------------------------ Local Constants ------------------------------
+local CONSOLE_LINES = 9
+local CONSOLE_CHARS_PER_LINE = 67
 
 ------------------------------ Helpers ------------------------------
 --Note: This function is available as part of love's math module
@@ -18,12 +23,23 @@ local function colorFromBytes(r, g, b, a)
 	return nr, ng, nb, na
 end
 
+local function getTextW(str)
+	local font = love.graphics.getFont()
+	local text = love.graphics.newText(font, str)
+	return text:getWidth()
+end
+
+local function getTextH(str)
+	local font = love.graphics.getFont()
+	local text = love.graphics.newText(font, str)
+	return text:getHeight()
+end
+
 ------------------------------ Constructor ------------------------------
 local Display = class("Display")
 --Note: This class is a singleton.
 function Display:initialize()
-	self.backgroundColor = {colorFromBytes(12, 1, 69)}
-	love.graphics.setBackgroundColor(self.backgroundColor)
+	love.graphics.setBackgroundColor(self.BACKGROUND_COLOR)
 	--local succ, ip = pcall(os.execute, "ipconfig getifaddr en1")
 	local succ, handle = pcall(io.popen, "ipconfig getifaddr en1") 
 	if succ then
@@ -33,13 +49,25 @@ function Display:initialize()
 	else
 		self.machineIp = "failed-to-fetch"
 	end
+	
+	self.fonts = {
+		ROBOTO_MONO_REGULAR = love.graphics.newFont("assets/roboto_mono/RobotoMono-Regular.ttf"),
+	}
+		
+	self.console = ConsoleStringBuilder(CONSOLE_LINES, CONSOLE_CHARS_PER_LINE)
+		
 end
 
 ------------------------------ Constants ------------------------------
+Display.BACKGROUND_COLOR = {colorFromBytes(32, 31, 99)}
+
 Display.SCREEN_W = 480
 Display.SCREEN_H = 320
 Display.LINE_H = 30
 Display.STAT_INDENT = 130
+
+local CONSOLE_LINES = 15
+local CONSOLE_CHARS_PER_LINE = 67
 
 ------------------------------ Widget Options ------------------------------
 local window = {
@@ -49,6 +77,19 @@ local window = {
 	W = Display.SCREEN_W,
 	H = Display.SCREEN_H,
 	AutoSizeWindow = false,
+	BgColor = Display.BACKGROUND_COLOR,
+}
+
+local _h = getTextH("foo") * CONSOLE_LINES
+local consoleWindow = {
+	id = "console",
+	X = 0,
+	Y = Display.SCREEN_H - _h,
+	--To prevent Slab.Textf's wrapped texted from displaying a (1 pixel) scroll bar.
+	W = love.graphics.getWidth() - 1,
+	H = _h,
+	AutoSizeWindow = false,
+	BgColor = Display.BACKGROUND_COLOR,
 }
 
 local isConfirming
@@ -120,7 +161,15 @@ function Display:update(dt)
 			isConfirming = isConfirming.onClick(result)
 		end
 	end
-			
+		
+	Slab.EndWindow()
+	
+	Slab.BeginWindow(consoleWindow.id, consoleWindow)
+	Slab.PushFont(self.fonts.ROBOTO_MONO_REGULAR)
+	
+	Slab.Text(self.console:getContent())
+	
+	Slab.PopFont()	
 	Slab.EndWindow()
 end
 

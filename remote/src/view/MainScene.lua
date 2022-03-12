@@ -85,12 +85,18 @@ local popupRebootRobot = {
 function MainScene:update(dt)
 	Slab.BeginWindow(window.id, window)
 	
-	--Version
-	Slab.Text("Version: " .. AppData:getVersionString())
 	--Prj Name
 	local prjNameXPos = window.W - getTextW(AppData.PROJECT_NAME) - 10
 	Slab.SetCursorPos(prjNameXPos, 0)
 	Slab.Text(AppData.PROJECT_NAME)
+	Slab.SetCursorPos(prjNameXPos - 7, getTextH("foo"))
+	if Slab.Button("Change Target") then
+		self.fsm:goto("target_change_scene")
+	end
+	Slab.SetCursorPos(0, 0)
+	--Version
+	Slab.Text("Version: " .. AppData:getVersionString())
+	--Server Info
 	Slab.Text("Machine (Client) IP: " .. self.machineIp)
 	Slab.Text("Target (Server) IP: " .. AppData.targetIp)
 	Slab.Text("Port: " .. AppData.port)

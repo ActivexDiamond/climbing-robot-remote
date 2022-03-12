@@ -13,10 +13,14 @@ local AppData = {
 	
 	--Networking Related
 	openIp = "*",
-	targetIp = "192.168.0.143",
+	targetIp = nil,			--Set by _fetchTarget below.
 	port = 9000,
-	PING_INTERVAL = 4,
-	PINGS_BEFORE_TIMEOUT = 4,
+	PING_INTERVAL = 1,
+	PINGS_BEFORE_TIMEOUT = 3,
+	
+	--Target IP Config Related
+	TARGET_IP_CONFIG_FILE = "target_ip.cfg",
+	TARGET_IP_CONFIG_DEFAULT = "localhost",
 	
 	--Priviliages
 	CAN_REBOOT_REMOTE = false,
@@ -33,4 +37,24 @@ function AppData:getVersionString()
 	end
 end
 
+function AppData:_fetchTarget()
+	local file = love.filesystem.newFile(self.TARGET_IP_CONFIG_FILE)
+	file:open('r')
+	self.targetIp = file:read()
+	file:close()
+	if not self.targetIp or #self.targetIp < 1 then
+		self.targetIp = self.TARGET_IP_CONFIG_DEFAULT
+	end
+end
+
+function AppData:updateTarget(newTarget)
+	local file = love.filesystem.newFile(self.TARGET_IP_CONFIG_FILE)
+	file:open("w")
+	file:write(newTarget)
+	file:close()
+	
+	self:_fetchTarget()		
+end
+
+AppData:_fetchTarget()
 return AppData

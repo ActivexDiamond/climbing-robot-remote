@@ -4,9 +4,6 @@ local Fsm = require "libs.SimpleFsm.Fsm"
 
 local LogoScene = require "view.LogoScene"
 local MainScene = require "view.MainScene"
-local ManualScene = require "view.ManualScene"
-local AutoScene = require "view.AutoScene"
-local TargetChangeScene = require "view.TargetChangeScene"
 
 local PeripheralApi = require "PeripheralApi"
 
@@ -20,15 +17,8 @@ function Display:initialize(w, h)
 		self.w, self.h = love.window.getMode()
 	end
 	
-
-	
-	
 	self.fonts = {
-		SYMBOLA = love.graphics.newFont("assets/Symbola.ttf"),
 		ROBOTO_MONO_REGULAR = love.graphics.newFont("assets/roboto_mono/RobotoMono-Regular.ttf"),
-		ROBOTO_MONO_BOLD = love.graphics.newFont("assets/roboto_mono/RobotoMono-Bold.ttf"),
-		ROBOTO_MONO_ITALIC = love.graphics.newFont("assets/roboto_mono/RobotoMono-Italic.ttf"),
-		ROBOTO_MONO_LIGHT = love.graphics.newFont("assets/roboto_mono/RobotoMono-Light.ttf"),
 	}
 	
 	self.fsm = Fsm()
@@ -37,9 +27,6 @@ function Display:initialize(w, h)
 	self.scenes = {
 		logo_scene = LogoScene(),
 		main_scene = MainScene(),
-		manual_scene = ManualScene(),
-		auto_scene = AutoScene(),
-		target_change_scene = TargetChangeScene(),
 	}
 	
 	for k, v in pairs(self.scenes) do
@@ -51,10 +38,6 @@ end
 
 ------------------------------ API ------------------------------
 function Display:update(dt)
-	if not (self.fsm:at("logo_scene") or self.fsm:at("target_change_scene")) and 
-			not PeripheralApi:ping() then
-		self.fsm:goto("main_scene")
-	end
 end
 
 function Display:draw(g2d)

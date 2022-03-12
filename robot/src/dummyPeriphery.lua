@@ -28,6 +28,7 @@ function m.GPIO(pin, dir)
 				self.pin)
 		return true
 	end
+	return self
 end
 
 return m

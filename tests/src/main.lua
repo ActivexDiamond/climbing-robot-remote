@@ -66,8 +66,12 @@ end
 local fps = 5
 
 --Pins
-local trig = Gpio(35, 'out')
-local echo = Gpio(37, 'in')
+
+local trig = Gpio(16, 'out')
+local echo = Gpio(18, 'in')
+
+--local trig = Gpio(35, 'out')
+--local echo = Gpio(37, 'in')
 
 --local trig = Gpio("GPIO.24", 'out')
 --local echo = Gpio("GPIO.25", 'in')

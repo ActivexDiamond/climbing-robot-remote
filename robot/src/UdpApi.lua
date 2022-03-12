@@ -2,8 +2,9 @@ local class = require "libs.middleclass"
 local sock = require "libs.sock"
 
 local PiApi = require "PiAPi"
-local AppData = require "AppData"
+local Scheduler = require "libs.Scheduler"
 
+local AppData = require "AppData"
 
 ------------------------------ Heleprs ------------------------------
 local function peerToString(peer)
@@ -23,6 +24,9 @@ function UdpApi:_initServer()
 	self.port = AppData.port
 	self.server = sock.newServer(self.openIp, self.port)
 	self:_injectEvents()
+	Scheduler:callEvery(AppData.PING_INTERVAL, function()
+		self:pingAll()
+	end)
 end
 
 ------------------------------ Core API ------------------------------
@@ -31,6 +35,10 @@ function UdpApi:update(dt)
 end
 
 ------------------------------ API ------------------------------
+function UdpApi:pingAll()
+	self:sendToAll("ping")
+end
+
 function UdpApi:sendToAll(ev, data)
 	self.server:sendToAll(ev, data)
 end
@@ -117,11 +125,11 @@ end
 
 --Cutters
 function UdpApi.events:c_worm_set(angle)
-	PiApi:cutterWormSet(angle)
+	PiApi:setCutterWormAngle(angle)
 end
 
 function UdpApi.events:c_wheel_set(angle)
-	PiApi:cutterWheelSet(angle)
+	PiApi:setCutterWheelAngle(angle)
 end
 
 --Sensors

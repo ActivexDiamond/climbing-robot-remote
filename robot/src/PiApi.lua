@@ -10,11 +10,15 @@ local Serial, Gpio
 do
 	local succ, msg = pcall(require, "periphery")
 	if succ then
+		print("Loading Lua-Periphery for board functions")
 		Serial = require("periphery").Serial
 		Gpio = require("periphery").GPIO
 	else
+		print("Lua-Periphery not found. Loading a dummy version.")
 		Serial = require("dummyPeriphery").Serial
 		Gpio = require("dummyPeriphery").GPIO
+		print(Serial)
+		print(Serial(0, 9600))
 	end
 end
 
@@ -41,7 +45,7 @@ end
 local PiApi = class("PiApi")
 --Note: This class is a singleton.
 function PiApi:initialize()
-	--TODO: Implement.
+	self:_initSerial()
 end
 
 ------------------------------ Commands ------------------------------
@@ -138,13 +142,11 @@ end
 ---Recives a valid command name, converts it to it's respective code,
 --	appends terminating characters and then transmits it to the Nano.
 --Note: No validation is done on the cmdName, must be done by the user.
-function PiApi:_transmitSerialCmd(cmdName, ...)
-	print(cmdName)
+function PiApi:_transmitSerialCmd(code, ...)
 	local args = {...}
-	local cmd = self.cmds[cmdName]
-	local str = cmd.code .. self.serial.eoc
-	for i = 1, cmd.args do
-		str = args[i] .. self.serial.eoc
+	local str = code .. self.serial.eoc
+	for i = 1, #args do
+		str = str .. args[i] .. self.serial.eoc
 	end
 	print("Writing command to serial: " .. str)
 	self.serial:write(str)	
@@ -251,64 +253,64 @@ end
 ------------------------------ API - Arm ------------------------------
 ---Halt all arm movement.
 function PiApi:armStop()
-	self:_transmitSerialCmd(self.cmds.arm_stop)
+	self:_transmitSerialCmd(self.cmds.arm_stop.code)
 end
 
 ---Set the arm to move forwards at "speed" velocity.
 function PiApi:armForward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_forward, speed)
+	self:_transmitSerialCmd(self.cmds.arm_forward.code, speed)
 end
 
 ---Set the arm to move backwards at "speed" velocity.
 function PiApi:armBackward(speed)
-	self:_transmitSerialCmd(self.cmds.arm_backward, speed)
+	self:_transmitSerialCmd(self.cmds.arm_backward.code, speed)
 end
 
 ---Set the arm to move upwards at "speed" velocity.
 function PiApi:armUp(speed)
-	self:_transmitSerialCmd(self.cmds.arm_up, speed)
+	self:_transmitSerialCmd(self.cmds.arm_up.code, speed)
 end
 
 ---Set the arm to move downwards at "speed" velocity.
 function PiApi:armDown(speed)
-	self:_transmitSerialCmd(self.cmds.arm_down, speed)
+	self:_transmitSerialCmd(self.cmds.arm_down.code, speed)
 end
 
 ------------------------------ API - Wheel ------------------------------
 ---Halt all chasis (wheel) movement.
 function PiApi:wheelStop()
-	self:_transmitSerialCmd(self.cmds.wheel_stop)
+	self:_transmitSerialCmd(self.cmds.wheel_stop.code)
 end
 
 ---Move the chasis forwards at "speed" velocity.
 function PiApi:wheelForward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_forward, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_forward.code, speed)
 end
 
 ---Move the chasis backwards at "speed" velocity.
 function PiApi:wheelBackward(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_backward, speed)
+	self:_transmitSerialCmd(self.cmds.wheel_backward.code, speed)
 end
 
 ---Turn the chasis left at "speed" velocity.
-function PiApi:wheelleft(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_left, speed)
+function PiApi:wheelLeft(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_left.code, speed)
 end
 
 ---Turn the chasis right at "speed" velocity.
-function PiApi:wheelright(speed)
-	self:_transmitSerialCmd(self.cmds.wheel_right, speed)
+function PiApi:wheelRight(speed)
+	self:_transmitSerialCmd(self.cmds.wheel_right.code, speed)
 end
 
 -------------------------------- API - Cutters ------------------------------
 ---Set the angle of the cutter worm to "angle".
 function PiApi:setCutterWormAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_worm_set, angle)
+	self:_transmitSerialCmd(self.cmds.c_worm_set.code, angle)
 end
 
 ---Set the angle of the cutter wheel to "angle".
 function PiApi:setCutterWheelAngle(angle)
-	self:_transmitSerialCmd(self.cmds.c_wheel_set, angle)
+	self:_transmitSerialCmd(self.cmds.c_wheel_set.code, angle)
 end
 
 -------------------------------- API - Sensors ------------------------------
@@ -331,4 +333,4 @@ function PiApi:isFallen()
 	--TODO: Implement.
 end
 
-return PiApi
+return PiApi()
