@@ -226,6 +226,15 @@ function PiApi:_readGyroscope()
 	--TODO: Implement.
 end
 
+------------------------------ Core - System Specs ------------------------------
+function PiApi:update(dt)
+	local buf = self.serial:read(self.serial:input_waiting())
+	if #buf > 0 then
+		print("[nano/] " .. buf)
+	end
+		
+end
+
 ------------------------------ API - System Specs ------------------------------
 function PiApi:getCpuTemp()
 	--TODO: Implement

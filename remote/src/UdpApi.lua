@@ -113,15 +113,11 @@ function UdpApi.events:rt(val)
 	self.rtVal = val
 end
 
-function UdpApi.events:sensor_ultrasonic_left(...)
-	print 'nnn'
-	for k, v in ipairs({...}) do print(k, v) end
+function UdpApi.events:sensor_ultrasonic_left(dist)
 	self.ultrasonicLeftDistance = dist
 end
 
-function UdpApi.events:sensor_ultrasonic_right(...)
-	print 'nnn'
-	for k, v in ipairs({...}) do print(k, v) end
+function UdpApi.events:sensor_ultrasonic_right(dist)
 	self.ultrasonicRightDistance = dist
 end
 

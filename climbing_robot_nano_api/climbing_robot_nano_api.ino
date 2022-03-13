@@ -1,7 +1,4 @@
 #include <Servo.h>
-#include <SoftwareSerial.h>
-#include <Ultrasonic.h>
-
 Servo rightWheel;
 Servo leftWheel;
 #define rWheel_pin A1
@@ -15,7 +12,7 @@ Servo cutterWheel;
 #define wormClose 10
 
 //#define bluetooth Serial
-SoftwareSerial bluetooth(2,7);
+//SoftwareSerial bluetooth(2,7);
 #define debug true
 
 #define UD_LPWM 6
@@ -23,10 +20,10 @@ SoftwareSerial bluetooth(2,7);
 #define FB_LPWM 11
 #define FB_RPWM 3
 
-#define trigger 8
-#define echo 9
-unsigned long usT = 0;
-Ultrasonic ultrasonic(trigger, echo);
+//#define trigger 8
+//#define echo 9
+//unsigned long usT = 0;
+//Ultrasonic ultrasonic(trigger, echo);
 
 void setup() {
   pinMode(UD_LPWM,OUTPUT); pinMode(UD_RPWM,OUTPUT); pinMode(FB_LPWM,OUTPUT); pinMode(FB_RPWM,OUTPUT);
@@ -36,17 +33,17 @@ void setup() {
   cutterWheel.attach(cutterWheel_pin);
   rightWheel.write(90); leftWheel.write(90);
   cutterWorm.write(wormClose); cutterWheel.write(0);
-  bluetooth.begin(9600);
+  //bluetooth.begin(9600);
   Serial.begin(9600);
-  usT = millis();
+//  usT = millis();
 }
 
 void loop() {
-  while(bluetooth.available()){
-    String c = bluetooth.readStringUntil(';');
+  while(Serial.available()){
+    String c = Serial.readStringUntil(';');
     if(c=="AS") ARM_Stop();
-    if(c=="AU" || c=="AD" || c=="AF" || c=="AB"){
-      int s = bluetooth.readStringUntil(';').toInt();
+    if(c=="AU" || c=="AD" || c=="AF" || c=="AB"){  
+      int s = Serial.readStringUntil(';').toInt();
       if(c == "AU") ARM_Up(s);
       if(c == "AD") ARM_Down(s);
       if(c == "AF") ARM_Forward(s);
@@ -56,29 +53,29 @@ void loop() {
     if(c == "WR") Wheel_Right();
     if(c == "WL") Wheel_Left();
     if(c=="WF" || c=="WB"){
-      int d = bluetooth.readStringUntil(';').toInt();
+      int d = Serial.readStringUntil(';').toInt();
       d = map(d,75,255,90,0);
       if(c == "WF") Wheel_Forward(d);
       if(c == "WB") Wheel_Backward(d);
     }
     if(c == "CWorm"){
-      int d = bluetooth.readStringUntil(';').toInt();
+      int d = Serial.readStringUntil(';').toInt();
       d = map(d,0,5,wormClose,wormOpen);
       cutterWorm.write(d);
     }
     if(c == "CWheel"){
-      int d = bluetooth.readStringUntil(';').toInt();
+      int d = Serial.readStringUntil(';').toInt();
       d = map(d,0,10,0,180);
       cutterWheel.write(d);      
     }
   }
-  if(millis()> usT + 500){
-    int cm = 0;
-    while(cm==0) cm = ultrasonic.distanceRead();
-    bluetooth.print("us;" + String(cm) + ";");
-    if(debug) Serial.println("us;" + String(cm) + ";");
-    usT = millis();
-  }
+//  if(millis()> usT + 500){
+//    int cm = 0;
+//    while(cm==0) cm = ultrasonic.distanceRead();
+//    bluetooth.print("us;" + String(cm) + ";");
+//    if(debug) Serial.println("us;" + String(cm) + ";");
+//    usT = millis();
+//  }
 }
 
 void ARM_Stop(){

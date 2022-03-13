@@ -152,7 +152,7 @@ function ManualScene:update(dt)
 	end
 	
 	--Ultrasonics
-	local leftStr = string.format("LEFT-HC-SR04:   %.2fcm", PeripheralApi:getLeftUltrasonic())
+	local leftStr = string.format("LEFT-HC-SR04:    %.2fcm", PeripheralApi:getLeftUltrasonic())
 	Slab.Text(leftStr)
 	local rightStr = string.format("RIGHT-HC-SR04: %.2fcm", PeripheralApi:getRightUltrasonic())
 	Slab.Text(rightStr)
