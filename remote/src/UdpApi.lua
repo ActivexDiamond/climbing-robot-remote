@@ -10,6 +10,9 @@ local AppData = require "AppData"
 local UdpApi = class("UdpApi")
 --Note: This class is a singleton.
 function UdpApi:initialize()
+	self.ultrasonicLeftDistance = 0
+	self.ultrasonicRightDistance = 0
+
 	self.lastPing = 0
 	self:reloadPeer()
 end
@@ -110,11 +113,15 @@ function UdpApi.events:rt(val)
 	self.rtVal = val
 end
 
-function UdpApi.events:sensor_ultrasonic_left(dist)
+function UdpApi.events:sensor_ultrasonic_left(...)
+	print 'nnn'
+	for k, v in ipairs({...}) do print(k, v) end
 	self.ultrasonicLeftDistance = dist
 end
 
-function UdpApi.events:sensor_ultrasonic_right(dist)
+function UdpApi.events:sensor_ultrasonic_right(...)
+	print 'nnn'
+	for k, v in ipairs({...}) do print(k, v) end
 	self.ultrasonicRightDistance = dist
 end
 

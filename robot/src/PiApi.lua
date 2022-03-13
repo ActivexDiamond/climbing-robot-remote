@@ -215,10 +215,9 @@ function PiApi:_readUltrasonic(target)
 	--Read the length of the response pulse.
 	local len = readPulseLength(echo, self.ultrasonicTimeoutTimer)
 	--Speed of sound in air, in centimeters, divided be 2, as the wave must travel to and fro.
-	local dist = len * 0.034 / 2
---	local str = string.format("Distance to [%s] ultrasonic is %fcm.",
---			target, dist)
---	print(str)
+	local dist = len * 17150
+	return dist
+
 	--TODO: Test this out on real hardware and confirm the results.
 end
 

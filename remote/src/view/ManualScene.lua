@@ -146,10 +146,17 @@ local window = {
 function ManualScene:update(dt)
 	Slab.BeginWindow(window.id, window)
 	
+	--Back
 	if Slab.Button("Back") then
 		self.fsm:goto("main_scene")
 	end
-
+	
+	--Ultrasonics
+	local leftStr = string.format("LEFT-HC-SR04:   %.2fcm", PeripheralApi:getLeftUltrasonic())
+	Slab.Text(leftStr)
+	local rightStr = string.format("RIGHT-HC-SR04: %.2fcm", PeripheralApi:getRightUltrasonic())
+	Slab.Text(rightStr)
+	
 	--Chasis Joystick
 	Slab.SetCursorPos(self.buttonOffset, window.H - self.buttonOffset * 4.5)
 	joystick({
