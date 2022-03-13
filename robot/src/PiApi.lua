@@ -96,7 +96,7 @@ PiApi.hardware = {
 		},
 
 	serial = {
-		port = "dev/ttyUSB0",
+		port = "/dev/ttyUSB0",
 		baudrate = 9600,
 		eol = "\n",
 		eoc = ";",
