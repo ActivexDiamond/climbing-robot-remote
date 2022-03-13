@@ -44,6 +44,7 @@ function MainScene:initialize()
 	love.graphics.setBackgroundColor(self.BACKGROUND_COLOR)
 	
 	local os = love.system.getOS()
+	print(os)
 	local cmd
 	if os == "OS X" then
 		cmd = "ipconfig getifaddr en1"
