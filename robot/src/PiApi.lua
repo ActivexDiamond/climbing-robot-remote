@@ -96,7 +96,7 @@ PiApi.hardware = {
 		},
 
 	serial = {
-		port = "dev/ttyUSB9",
+		port = "dev/ttyUSB0",
 		baudrate = 9600,
 		eol = "\n",
 		eoc = ";",
@@ -250,12 +250,12 @@ end
 
 function PiApi:getRamUsage()
 	--TODO: Implement
-	return "0.50GB/8.00GB"
+	return "0.5GB/8GB"
 end
 
 function PiApi:getDiskUsage()
 	--TODO: Implement
-	return "14.8GB/32.0GB"
+	return "15GB/32GB"
 end
 
 ------------------------------ API - System ------------------------------
