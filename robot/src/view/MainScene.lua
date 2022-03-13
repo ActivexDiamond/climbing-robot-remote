@@ -89,6 +89,7 @@ local window = {
 	W = MainScene.SCREEN_W,
 	H = MainScene.SCREEN_H,
 	AutoSizeWindow = false,
+	AllowFocus = false,
 	BgColor = MainScene.BACKGROUND_COLOR,
 }
 
