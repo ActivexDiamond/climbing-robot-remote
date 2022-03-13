@@ -110,11 +110,11 @@ function UdpApi.events:rt(val)
 	self.rtVal = val
 end
 
-function UdpApi.event:sensor_ultrasonic_left(dist)
+function UdpApi.events:sensor_ultrasonic_left(dist)
 	self.ultrasonicLeftDistance = dist
 end
 
-function UdpApi.event:sensor_ultrasonic_right(dist)
+function UdpApi.events:sensor_ultrasonic_right(dist)
 	self.ultrasonicRightDistance = dist
 end
 

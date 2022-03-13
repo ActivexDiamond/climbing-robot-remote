@@ -70,7 +70,7 @@ end
 local PiApi = class("PiApi")
 --Note: This class is a singleton.
 function PiApi:initialize()
-	self.ULTRASONIC_READ_TIMEOUT = 0.5
+	self.ULTRASONIC_READ_TIMEOUT = 1000 / 1e6 --microseconds
 	self.ultrasonicTimeoutTimer = TimeoutTimer(self.ULTRASONIC_READ_TIMEOUT)
 	self:_initSerial()
 	self:_initGpio()
