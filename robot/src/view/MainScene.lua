@@ -42,8 +42,18 @@ local MainScene = class("MainScene", State)
 --Note: This class is a singleton.
 function MainScene:initialize()
 	love.graphics.setBackgroundColor(self.BACKGROUND_COLOR)
-	--local succ, ip = pcall(os.execute, "ipconfig getifaddr en1")
-	local succ, handle = pcall(io.popen, "ipconfig getifaddr en1") 
+	
+	local os = love.system.getOS()
+	local cmd
+	if os == "OS X" then
+		cmd = "ipconfig getifaddr en1"
+	elseif os == Linux then
+		cmd = "hostname -I"
+	else
+		cmd = "echo Auto-IP grab not supported for your OS."
+	end
+		
+	local succ, handle = pcall(io.popen, cmd) 
 	if succ then
 		local ip = handle:read("*a"):sub(1, -2)
 		self.machineIp = ip
@@ -51,7 +61,7 @@ function MainScene:initialize()
 	else
 		self.machineIp = "failed-to-fetch"
 	end
-	
+
 	self:_wrapPrint()	
 end
 
