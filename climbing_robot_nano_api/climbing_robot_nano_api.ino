@@ -36,6 +36,11 @@ void setup() {
   //bluetooth.begin(9600);
   Serial.begin(9600);
 //  usT = millis();
+
+  ARM_Stop();
+  Wheel_Stop();
+  cutterWorm.write(wormClose);
+  cutterWheel.write(0);
 }
 
 void loop() {

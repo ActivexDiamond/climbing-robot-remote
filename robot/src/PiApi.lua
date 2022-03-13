@@ -228,7 +228,7 @@ end
 
 ------------------------------ Core - System Specs ------------------------------
 function PiApi:update(dt)
-	local buf = self.serial:read(self.serial:input_waiting())
+	local buf = self.serial:read(128)
 	if #buf > 0 then
 		print("[nano/] " .. buf)
 	end
