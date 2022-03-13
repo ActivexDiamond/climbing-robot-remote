@@ -164,7 +164,7 @@ PiApi.cmds = {
 function PiApi:_initSerial()
 	local cfg = self.hardware.serial
 	self.serial = Serial(cfg.port, cfg.baudrate)
-	self.serial.eoc = cfg.eoc
+	self.serialEoc = cfg.eoc
 end
 
 ---Recives a valid command name, converts it to it's respective code,
@@ -172,9 +172,9 @@ end
 --Note: No validation is done on the cmdName, must be done by the user.
 function PiApi:_transmitSerialCmd(code, ...)
 	local args = {...}
-	local str = code .. self.serial.eoc
+	local str = code .. self.serialEoc
 	for i = 1, #args do
-		str = str .. args[i] .. self.serial.eoc
+		str = str .. args[i] .. self.serialEoc
 	end
 	print("Writing command to serial: " .. str)
 	self.serial:write(str)	
