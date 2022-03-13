@@ -18,15 +18,15 @@ function m.GPIO(pin, dir)
 	self.dir = dir
 	
 	function self:write(state)
-		local str = string.format("[dummyPeriphery/%s:write: ] %s",
-				self.pin, state)
-		print(str)
+--		local str = string.format("[dummyPeriphery/%s:write: ] %s",
+--				self.pin, state)
+--		print(str)
 	end
 	
 	function self:read()
-		local str = string.format("[dummyPeriphery/%s:read: ] hardcoded-true",
-				self.pin)
-		print(str)
+--		local str = string.format("[dummyPeriphery/%s:read: ] hardcoded-true",
+--				self.pin)
+--		print(str)
 		return true
 	end
 	return self

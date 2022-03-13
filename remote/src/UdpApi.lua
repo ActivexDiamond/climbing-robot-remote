@@ -82,6 +82,13 @@ function UdpApi:_injectEvents()
 end
 
 ------------------------------ Getters / Setters ------------------------------
+function UdpApi:getUltrasonicLeftDistance()
+	return self.ultrasonicLeftDistance
+end
+
+function UdpApi:getUltrasonicRightDistance()
+	return self.ultrasonicRightDistance
+end
 
 ------------------------------ Events ------------------------------
 UdpApi.events = {}
@@ -96,12 +103,19 @@ function UdpApi.events:disconnect()
 end
 
 function UdpApi.events:ping(timeStamp)
-	print("Got ping!")
 	self.lastPing = love.timer.getTime()
 end
 
 function UdpApi.events:rt(val)
 	self.rtVal = val
+end
+
+function UdpApi.event:sensor_ultrasonic_left(dist)
+	self.ultrasonicLeftDistance = dist
+end
+
+function UdpApi.event:sensor_ultrasonic_right(dist)
+	self.ultrasonicRightDistance = dist
 end
 
 return UdpApi()

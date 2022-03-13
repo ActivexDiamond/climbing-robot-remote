@@ -6,6 +6,8 @@ local Scheduler = require "libs.Scheduler"
 
 local AppData = require "AppData"
 
+------------------------------ Private Values ------------------------------
+local lastUltrasonicUpdate = 0
 ------------------------------ Heleprs ------------------------------
 local function peerToString(peer)
 	return string.format("{%s}", table.concat(peer, ", "))
@@ -15,6 +17,7 @@ end
 local UdpApi = class("UdpApi")
 --Note: This class is a singleton.
 function UdpApi:initialize()
+	self.ULTRASONIC_UPDATE_INTERVAL = 2
 	self:_initServer()
 end
 
@@ -31,6 +34,15 @@ end
 
 ------------------------------ Core API ------------------------------
 function UdpApi:update(dt)
+	if love.timer.getTime() - lastUltrasonicUpdate > self.ULTRASONIC_UPDATE_INTERVAL then
+		local distLeft = PiApi:readUltrasonicLeft()
+		local distRight = PiApi:readUltrasonicRight()
+		
+		self:sendToAll("sensor_ultrasonic_left", distLeft)
+		self:sendToAll("sensor_ultrasonic_right", distRight)
+		lastUltrasonicUpdate = love.timer.getTime()
+	end
+	
 	self.server:update(dt)
 end
 
@@ -133,14 +145,6 @@ function UdpApi.events:c_wheel_set(angle)
 end
 
 --Sensors
-function UdpApi.events:sensor_ultrasonic_left()
-	PiApi:readLeftUltrasonic()
-end
-
-function UdpApi.events:sensor_ultrasonic_right()
-	PiApi:readRightUltrasonic()
-end
-
 function UdpApi.events:sensor_gyroscope_is_fallen()
 	PiApi:isFallen()
 end

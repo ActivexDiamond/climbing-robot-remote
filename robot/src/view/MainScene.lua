@@ -156,13 +156,13 @@ function MainScene:update(dt)
 	Slab.Text("PORT: " .. AppData.port)	
 	
 	--Quit
-	Slab.SetCursorPos(self.SCREEN_W - 205, self.SCREEN_H - 32)
+	Slab.SetCursorPos(self.SCREEN_W - 205, 80)
 	if Slab.Button("Quit") then
 		isConfirming = popupQuit
 	end
 
 	--Reboot
-	Slab.SetCursorPos(self.SCREEN_W - 105, self.SCREEN_H - 32)
+	Slab.SetCursorPos(self.SCREEN_W - 105, 80)
 	if Slab.Button("Reboot") then
 		isConfirming = popupRebootRobot
 	end

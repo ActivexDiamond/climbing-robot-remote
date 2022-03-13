@@ -27,25 +27,53 @@ local function microsecondSleep(ms)
 	love.timer.sleep(ms / 1e6)
 end
 
-local function readPulseLength(pin)
+local function TimeoutTimer(timeout)
+	return {
+		timeout = timeout,
+		startTime = love.timer.getTime(),
+		
+		shouldAbort = function(self)
+			return love.timer.getTime() - self.startTime > self.timeout
+		end,
+		reset = function(self)
+			self.startTime = love.timer.getTime()
+		end,
+	}
+end
+
+local function readPulseLength(pin, timeoutTimer)
+	local failed = false
 	local startTime, endTime
 	local getTime = love.timer.getTime		--Localize to optimize call.
 	--Read the length of the pulse from when the pin goes high,
 	--	till when it comes back low.
+	timeoutTimer:reset()
 	while not pin:read() do
+		if timeoutTimer:shouldAbort() then
+			failed = true
+			break
+		end
 		startTime = getTime()
 	end
+	timeoutTimer:reset()
 	while pin:read() do
+		if timeoutTimer:shouldAbort() then
+			failed = true
+			break
+		end
 		endTime = getTime()
 	end
-	return endTime - getTime
+	return failed and 0 or endTime - getTime
 end
 
 ------------------------------ Constructor ------------------------------
 local PiApi = class("PiApi")
 --Note: This class is a singleton.
 function PiApi:initialize()
+	self.ULTRASONIC_READ_TIMEOUT = 0.5
+	self.ultrasonicTimeoutTimer = TimeoutTimer(self.ULTRASONIC_READ_TIMEOUT)
 	self:_initSerial()
+	self:_initGpio()
 end
 
 ------------------------------ Commands ------------------------------
@@ -185,7 +213,7 @@ function PiApi:_readUltrasonic(target)
 	trig:write(false)
 	
 	--Read the length of the response pulse.
-	local len = readPulseLength(echo)
+	local len = readPulseLength(echo, self.ultrasonicTimeoutTimer)
 	--Speed of sound in air, in centimeters, divided be 2, as the wave must travel to and fro.
 	local dist = len * 0.034 / 2
 	local str = string.format("Distance to [%s] ultrasonic is %fcm.",
@@ -316,13 +344,13 @@ end
 -------------------------------- API - Sensors ------------------------------
 ---Returns the distance-value of the left ultrasonic sensor.
 -- @return						#number		;	Distance in centimeters.
-function PiApi:getUltrasonicLeft()
+function PiApi:readUltrasonicLeft()
 	return self:_readUltrasonic('left')
 end
 
 ---Returns the distance-value of the right ultrasonic sensor.
 -- @return							#number		;	Distance in centimeters.
-function PiApi:getUltrasonicRight()
+function PiApi:readUltrasonicRight()
 	return self:_readUltrasonic('right')
 end
 

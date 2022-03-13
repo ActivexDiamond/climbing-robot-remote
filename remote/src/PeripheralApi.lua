@@ -241,14 +241,14 @@ end
 
 ---Returns the distance from the left ultrasonic to the nearest object. In centimeters.
 -- @return 						#number		;	Distance in cm.
-function PeripheralApi:readLeftUltrasonic()
-	return self:_sendCmd("sensor_ultrasonic_left")
+function PeripheralApi:getLeftUltrasonic()
+	return UdpApi:getUltrasonicLeftDistance()
 end
 
 ---Returns the distance from the right ultrasonic to the nearest object. In centimeters.
 -- @return 						#number		;	Distance in cm.
-function PeripheralApi:readRightUltrasonic()
-	return self:_sendCmd("sensor_ultrasonic_right")
+function PeripheralApi:getRightUltrasonic()
+	return UdpApi:getUltrasonicRightDistance()
 end
 
 ------------------------------ API - Networking ------------------------------

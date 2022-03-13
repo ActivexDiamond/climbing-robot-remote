@@ -76,6 +76,17 @@ local function joystick(dirs, label, buttonSize, buttonPad)
 	if Slab.Button(n.id, nOpt) then
 		rtVal = n.callback and n.callback(n.id) or callback(n.id)
 	end
+	--Center
+	
+	local c = dirs.center
+	if c then
+		Slab.SetCursorPos(initX + offset, initY + offset) 
+		local cOpt = imgButtonOpt(buttonSize, c.imgPath)
+		if Slab.Button(c.id, cOpt) then
+			rtVal = c.callback and c.callback(c.id) or callback(c.id)
+		end
+	end
+	
 	--South
 	Slab.SetCursorPos(initX + offset, initY + offset * 2) 
 	local s = dirs.south
@@ -142,6 +153,10 @@ function ManualScene:update(dt)
 	--Chasis Joystick
 	Slab.SetCursorPos(self.buttonOffset, window.H - self.buttonOffset * 4.5)
 	joystick({
+		center = {id = "stop", imgPath = AppData.ASSET_DIR .. "stop.png",
+			callback = function() PeripheralApi:stopWheel()
+			end
+		},
 		north = {id = "forward", imgPath = AppData.ASSET_DIR .. "forward.png"},
 		south = {id = "backward", imgPath = AppData.ASSET_DIR .. "backward.png"},
 		west = {id = "left", imgPath = AppData.ASSET_DIR .. "left.png"},
@@ -177,6 +192,10 @@ function ManualScene:update(dt)
 	--Arm Joystick
 	Slab.SetCursorPos(window.W - self.buttonOffset * 4, window.H - self.buttonOffset * 4.5)
 	joystick({
+		center = {id = "stop", imgPath = AppData.ASSET_DIR .. "stop.png",
+			callback = function() PeripheralApi:stopArm()
+			end
+		},
 		north = {id = "forward", imgPath = AppData.ASSET_DIR .. "forward.png"},
 		south = {id = "backward", imgPath = AppData.ASSET_DIR .. "backward.png"},
 		west = {id = "up", imgPath = AppData.ASSET_DIR .. "up.png"},
