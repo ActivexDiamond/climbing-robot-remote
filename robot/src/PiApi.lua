@@ -96,7 +96,7 @@ PiApi.hardware = {
 		},
 
 	serial = {
-		port = "/dev/ttyUSB0",
+		port = "/dev/ttyUSB1",
 		baudrate = 9600,
 		eol = "\n",
 		eoc = ";",
@@ -228,7 +228,7 @@ end
 
 ------------------------------ Core - System Specs ------------------------------
 function PiApi:update(dt)
-	local buf = self.serial:read(128)
+	local buf = self.serial:read(self.serial:input_waiting())
 	if #buf > 0 then
 		print("[nano/] " .. buf)
 	end

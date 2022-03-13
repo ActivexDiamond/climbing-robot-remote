@@ -21,6 +21,7 @@ end
 local Slab = require "libs.Slab"
 
 local UdpApi = require "UdpApi"
+local PiApi = require "PiApi"
 local Scheduler = require "libs.Scheduler"
 
 --local dummyServer = require "DummyServer"
@@ -41,7 +42,8 @@ function love.update(dt)
 		
 	Slab.Update(dt)
 	
-	UdpApi:update()
+	UdpApi:update(dt)
+	PiApi:update(dt)
 	--dummyServer.update(dt)
 	Display:update(dt)
 	Scheduler:tick(dt)
