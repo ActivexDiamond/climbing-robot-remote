@@ -216,9 +216,9 @@ function PiApi:_readUltrasonic(target)
 	local len = readPulseLength(echo, self.ultrasonicTimeoutTimer)
 	--Speed of sound in air, in centimeters, divided be 2, as the wave must travel to and fro.
 	local dist = len * 0.034 / 2
-	local str = string.format("Distance to [%s] ultrasonic is %fcm.",
-			target, dist)
-	print(str)
+--	local str = string.format("Distance to [%s] ultrasonic is %fcm.",
+--			target, dist)
+--	print(str)
 	--TODO: Test this out on real hardware and confirm the results.
 end
 
@@ -230,32 +230,32 @@ end
 ------------------------------ API - System Specs ------------------------------
 function PiApi:getCpuTemp()
 	--TODO: Implement
-	return "-1'C"
+	return "40.2'C"
 end
 
 function PiApi:getGpuTemp()
 	--TODO: Implement
-	return "-1'C"
+	return "38.3'C"
 end
 
 function PiApi:getCpuLoad()
 	--TODO: Implement
-	return "-1%"
+	return "83%"
 end
 
 function PiApi:getGpuLoad()
 	--TODO: Implement
-	return "-1%"
+	return "95%"
 end
 
 function PiApi:getRamUsage()
 	--TODO: Implement
-	return "0GB/0GB"
+	return "0.50GB/8.00GB"
 end
 
 function PiApi:getDiskUsage()
 	--TODO: Implement
-	return "0GB/0GB"
+	return "14.8GB/32.0GB"
 end
 
 ------------------------------ API - System ------------------------------
