@@ -48,7 +48,7 @@ function MainScene:initialize()
 	local cmd
 	if os == "OS X" then
 		cmd = "ipconfig getifaddr en1"
-	elseif os == Linux then
+	elseif os == "Linux" then
 		cmd = "hostname -I"
 	else
 		cmd = "echo Auto-IP grab not supported for your OS."
