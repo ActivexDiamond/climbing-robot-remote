@@ -1,7 +1,7 @@
 local class = require "libs.middleclass"
 local sock = require "libs.sock"
 
-local PiApi = require "PiAPi"
+local PiApi = require "PiApi"
 local Scheduler = require "libs.Scheduler"
 
 local AppData = require "AppData"
