@@ -79,11 +79,11 @@ end
 ------------------------------ Commands ------------------------------
 PiApi.hardware = {
 	pins = {
-		ultrasonicLeftTrig = 	"GPIO.24",
-		ultrasonicLeftEcho = 	"GPIO.25",
+		ultrasonicLeftTrig = 	24,			--"GPIO.24"
+		ultrasonicLeftEcho = 	25,			--"GPIO.25"
 		 
-		ultrasonicRightTrig = 	"GPIO.26",
-		ultrasonicRightEcho = 	"GPIO.27",
+		ultrasonicRightTrig = 	26,			--"GPIO.26"
+		ultrasonicRightEcho = 	27,			--"GPIO.27"
 		
 		gyroscopeSda = 			"SDA.0",
 		gyroscopeScl = 			"SDA.1",
