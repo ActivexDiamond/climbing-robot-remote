@@ -8,9 +8,22 @@ server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server.bind((IP, PORT))
 
 print("Entering recv loop.")
+
+str = """
+local t = {{}}
+t.msg = {}
+t.timestamp = {}
+return t
+"""
+msg = str.format("Hello!", 2)
+msgBytes = bytes(msg, "utf-8")
+
 while 1:
-	data, addr = server.recvfrom(1024)
-	print(data)
+	print("Sending data")
+	server.sendto(msgBytes)
+
+#	data, addr = server.recvfrom(1024)
+#	print(data)
 
 
 # text_send_server.py
