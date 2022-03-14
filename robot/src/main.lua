@@ -20,9 +20,10 @@ end
 
 local Slab = require "libs.Slab"
 
+local Scheduler = require "libs.Scheduler"
+
 local UdpApi = require "UdpApi"
 local PiApi = require "PiApi"
-local Scheduler = require "libs.Scheduler"
 
 --local dummyServer = require "DummyServer"
 

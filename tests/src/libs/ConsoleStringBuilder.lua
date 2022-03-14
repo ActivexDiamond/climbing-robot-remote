@@ -22,7 +22,7 @@ function ConsoleStringBuilder:print(...)
 		end
 		str = str:sub(1, -2)	--Remove trailing space.
 	end
-	self:_addString(str)
+	self:_addString(str .. '\n')
 end
 
 function ConsoleStringBuilder:clear()
@@ -33,14 +33,25 @@ end
 function ConsoleStringBuilder:_addString(str)
 	for i = 1, #str do
 		local c = str:sub(i, i)
-		self.str = self.str .. c
-		--print(#self.str)
-		if self:getRealStrLen() % self.charsPerLine == 0 then
-			--print("str mod 0")
+		if c == "\n" then
+			repeat
+				self.str = self.str .. " "
+			until self:getRealStrLen() % self.charsPerLine == 0
 			self.str = self.str .. "\n"
 			if self:getRealStrLen() == self.lines * self.charsPerLine then
 				--print("out of screen")
 				self.str = self.str:sub(self.charsPerLine + 2)
+			end		
+		else
+			self.str = self.str .. c
+			--print(#self.str)
+			if self:getRealStrLen() % self.charsPerLine == 0 then
+				--print("str mod 0")
+				self.str = self.str .. "\n"
+				if self:getRealStrLen() == self.lines * self.charsPerLine then
+					--print("out of screen")
+					self.str = self.str:sub(self.charsPerLine + 2)
+				end
 			end
 		end
 	end
