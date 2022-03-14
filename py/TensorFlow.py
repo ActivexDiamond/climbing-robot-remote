@@ -51,7 +51,7 @@ server.sendto(pingMsgBytes, peerAddress)
 
 def sendCnnData(str):
     print("Sending out cnn data")
-    jsonStr = json.dump(str)
+    jsonStr = json.dumps(str)
     jsonStrBytes = bytes(jsonStr, "utf-8")
     #print(str)
     #print("----- ----- -----")
