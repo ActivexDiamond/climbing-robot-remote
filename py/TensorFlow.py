@@ -46,11 +46,11 @@ bytesAddressPair = server.recvfrom(1024)
 #message = bytesAddressPair[0]
 peerAddress = bytesAddressPair[1]
 print("Got ping! [{}]".format(peerAddress))
-server.sendto(peerAddress, pingMsgBytes)
+server.sendto(pingMsgBytes, peerAddress)
 
 def sendCnnData(str):
     strBytes = bytes(str, "utf-8")
-    server.sendto(peerAddress, pingMsgBytes)
+    server.sendto(pingMsgBytes, strBytes)
 
 ############################################
 
