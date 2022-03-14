@@ -29,11 +29,11 @@ server.bind((OPEN_IP, PORT))
 print("Entering recv loop.")
 
 luaTemplate = """{
-  "boxes": {},
-  "classes": {},
-  "scores": {},
-  "minScore": {},
-  "frame": {},
+  \"boxes\": {},
+  \"classes\": {},
+  \"scores\": {},
+  \"minScore\": {},
+  \"frame\": {},
 }"""
 pingMsgBytes = bytes("pong", "utf-8")
 
