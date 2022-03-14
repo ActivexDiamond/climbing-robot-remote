@@ -49,8 +49,8 @@ print("Got ping! [{}]".format(peerAddress))
 server.sendto(peerAddress, pingMsgBytes)
 
 def sendCnnData(str):
-	strBytes = bytes(str, "utf-8")
-	server.sendto(peerAddress, pingMsgBytes)
+    strBytes = bytes(str, "utf-8")
+    server.sendto(peerAddress, pingMsgBytes)
 
 ############################################
 
@@ -104,12 +104,12 @@ while True:
             [detection_boxes, detection_scores, detection_classes, num_detections],
             feed_dict={image_tensor: frame_expanded})
 
-		cnnResult = luaTemplate.format(
-        	np.squeeze(boxes),
+        cnnResult = luaTemplate.format(
+            np.squeeze(boxes),
             np.squeeze(classes).astype(np.int32),
-            np.squeeze(scores),		
-			0.4						#min_score_threshold
-			frame)
+            np.squeeze(scores),
+            0.4                    #min_score_threshold
+            frame)
 		# Draw the results of the detection (aka 'visulaize the results')
         #vis_util.visualize_boxes_and_labels_on_image_array(
         #    frame,
