@@ -5,9 +5,10 @@ local PORT = 9004
 
 print("Client running.")
 local client = socket.udp()
-client:settimeout(0)
+--client:settimeout(0)
 print("Setting peer name.")
 client:setpeername(IP, PORT)
+client:send("ping")
 
 print("Entering listening loop.")
 function love.update(dt) 
@@ -22,6 +23,8 @@ function love.update(dt)
 		end
 	until not data
 	love.timer.sleep(2)
+	print("Pinging server.")
+	client:send("ping")
 end
 
 --[[

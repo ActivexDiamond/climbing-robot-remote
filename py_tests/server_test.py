@@ -21,8 +21,15 @@ msg = str.format("Hello!", 2)
 msgBytes = bytes(msg, "utf-8")
 
 while 1:
+	print("Listening for ping.")
+	bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+	message = bytesAddressPair[0]
+	address = bytesAddressPair[1]
+    
+	print("Message from {}:{}".format(address, message))
+
 	print("Sending data")
-	server.sendto(msgBytes, (TARGET_IP, PORT))
+	server.sendto(msgBytes, address)
 	time.sleep(2)
 #	data, addr = server.recvfrom(1024)
 #	print(data)
