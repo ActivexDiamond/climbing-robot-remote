@@ -5,7 +5,7 @@ PORT = 9004
 
 print("Setting up and binding server.")
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server.bind(IP, PORT)
+server.bind((IP, PORT))
 
 print("Entering recv loop.")
 while 1:
