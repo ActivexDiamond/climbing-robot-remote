@@ -33,7 +33,6 @@ luaTemplate = """{{
   "classes": {},
   "scores": {},
   "minScore": {},
-  "frame": {},
 }}"""
 pingMsgBytes = bytes("pong", "utf-8")
 
@@ -109,9 +108,9 @@ while True:
             json.dumps(np.squeeze(boxes).tolist()),
             json.dumps(np.squeeze(classes).astype(np.int32).tolist()),
             json.dumps(np.squeeze(scores).tolist()),
-            0.4,                    #min_score_threshold
-            json.dumps(frame.tolist()))                  #
+            0.4)                    #min_score_threshold
         sendCnnData(cnnResult)
+        sendCnnData(json.dumps(frame.tolist()))
 		# Draw the results of the detection (aka 'visulaize the results')
         #vis_util.visualize_boxes_and_labels_on_image_array(
         #    frame,
