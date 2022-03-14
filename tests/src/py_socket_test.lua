@@ -5,7 +5,7 @@ local PORT = 9004
 
 print("Client running.")
 local client = socket.udp()
---client:settimeout(0)
+client:settimeout(0)
 print("Setting peer name.")
 client:setpeername(IP, PORT)
 client:send("ping")
