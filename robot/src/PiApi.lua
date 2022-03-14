@@ -7,13 +7,13 @@ local AppData = require "AppData"
 --	forwarded to blank versions.
 --This facilitates development on non-Pi machines. 
 local Serial, Gpio
-local FORCE_DUMMY = true
+--local FORCE_DUMMY = true
 do
 	local succ, msg = pcall(require, "periphery")
 	if succ and not FORCE_DUMMY then
 		print("Loading Lua-Periphery for board functions")
 		Serial = require("periphery").Serial
-		Gpio = require("periphery").GPIO
+		Gpio = require("dummyPeriphery").GPIO
 	else
 		print("Lua-Periphery not found. Loading a dummy version.")
 		Serial = require("dummyPeriphery").Serial
