@@ -20,7 +20,7 @@ msgBytes = bytes(msg, "utf-8")
 
 while 1:
 	print("Sending data")
-	server.sendto(msgBytes)
+	server.sendto(msgBytes, (IP, PORT))
 
 #	data, addr = server.recvfrom(1024)
 #	print(data)
