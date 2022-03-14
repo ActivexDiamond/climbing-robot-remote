@@ -106,11 +106,11 @@ while True:
             feed_dict={image_tensor: frame_expanded})
 
         cnnResult = luaTemplate.format(
-            json.dumps(np.squeeze(boxes)),
-            json.dumps(np.squeeze(classes).astype(np.int32)),
-            json.dumps(np.squeeze(scores)),
+            json.dumps(np.squeeze(boxes).tolist()),
+            json.dumps(np.squeeze(classes).astype(np.int32).tolist()),
+            json.dumps(np.squeeze(scores).tolist()),
             0.4,                    #min_score_threshold
-            json.dumps(frame))                  #
+            json.dumps(frame.tolist()))                  #
         sendCnnData(cnnResult)
 		# Draw the results of the detection (aka 'visulaize the results')
         #vis_util.visualize_boxes_and_labels_on_image_array(
