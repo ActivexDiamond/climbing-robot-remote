@@ -1,4 +1,5 @@
 import socket
+import time
 
 IP = ""
 PORT = 9004
@@ -21,7 +22,7 @@ msgBytes = bytes(msg, "utf-8")
 while 1:
 	print("Sending data")
 	server.sendto(msgBytes, (IP, PORT))
-
+	time.sleep(2)
 #	data, addr = server.recvfrom(1024)
 #	print(data)
 
