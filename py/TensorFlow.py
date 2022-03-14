@@ -17,6 +17,7 @@ MODEL_NAME = 'ssdlite_mobilenet_v2_coco_2018_05_09'
 ###################### UDP Code ######################
 import socket
 import time
+import json
 
 OPEN_IP = ""
 PORT = 9004
@@ -49,11 +50,13 @@ print("Got ping! [{}]".format(peerAddress))
 server.sendto(pingMsgBytes, peerAddress)
 
 def sendCnnData(str):
-    print("Sending out the following cnn data")
-    print(str)
-    print("----- ----- -----")
+    print("Sending out cnn data")
+    jsonStr = json.dump(str)
+    jsonStrBytes = bytes(jsonStr, "utf-8")
+    #print(str)
+    #print("----- ----- -----")
     strBytes = bytes(str, "utf-8")
-    server.sendto(strBytes, peerAddress)
+    server.sendto(jsonStrBytes, peerAddress)
 
 ############################################
 
