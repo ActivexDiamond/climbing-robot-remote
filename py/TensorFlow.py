@@ -110,7 +110,7 @@ while True:
             json.dumps(np.squeeze(scores).tolist()),
             0.4)                    #min_score_threshold
         sendCnnData(cnnResult)
-        sendCnnData(json.dumps(frame.tolist()))
+        #sendCnnData(json.dumps(frame.tolist()))
 		# Draw the results of the detection (aka 'visulaize the results')
         #vis_util.visualize_boxes_and_labels_on_image_array(
         #    frame,
