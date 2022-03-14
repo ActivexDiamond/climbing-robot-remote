@@ -48,8 +48,8 @@ def sendTextViaSocket(message, sock):
         sock.sendall(encodedMessage)
     except:
         print("Pipe broken. Lost client. Waiting for new client.")
-        sock.listen()
-        conn, addr = sock.accept()      # Note: execution waits here until the client calls sock.connect()
+        #sock.listen()
+        #conn, addr = sock.accept()      # Note: execution waits here until the client calls sock.connect()
 
 
     # receive acknowledgment from the server
