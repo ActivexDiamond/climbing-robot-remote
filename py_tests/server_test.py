@@ -1,12 +1,13 @@
 import socket
 import time
 
-IP = "192.168.0.143"
+OPEN_IP = ""
+TARGET_IP = "192.168.0.143"
 PORT = 9004
 
 print("Setting up and binding server.")
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server.bind((IP, PORT))
+server.bind((OPEN_IP, PORT))
 
 print("Entering recv loop.")
 
@@ -21,7 +22,7 @@ msgBytes = bytes(msg, "utf-8")
 
 while 1:
 	print("Sending data")
-	server.sendto(msgBytes, (IP, PORT))
+	server.sendto(msgBytes, (TARGET_IP, PORT))
 	time.sleep(2)
 #	data, addr = server.recvfrom(1024)
 #	print(data)
