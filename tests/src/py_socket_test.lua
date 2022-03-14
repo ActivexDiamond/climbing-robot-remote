@@ -1,4 +1,5 @@
 local socket = require "socket"
+local json = require "libs.json"
 
 local IP = "192.168.0.113"
 local PORT = 9004
@@ -14,12 +15,15 @@ print("Entering listening loop.")
 function love.update(dt) 
 	local data, msg
 	repeat
-		data, msg = client:receive()
+		data, err = client:receive()
 		if data then
-			print("data: " .. data)
-		end
-		if msg then
-			print("msg: " .. msg)
+			local t = json.decode(data)
+			print("Got data! " .. data, t)
+			for k, v in pairs(t) do
+				print(k, v)
+			end
+		else
+			print("Got error from recieve: " .. err)
 		end
 	until not data
 	love.timer.sleep(2)
