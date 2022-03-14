@@ -265,6 +265,16 @@ function PeripheralApi:reconnet()
 	end
 end
 
+------------------------------ API - State ------------------------------
+function PeripheralApi:getAutoState()
+	--Check state of terrain and climbable obstacles.
+	if self.currentState == (self.states and self.states[1] or nil) then
+		return "Failed to identify terrain. Continuing to process CNN feed."
+	else
+		return self.states[self.currentState]
+	end	
+end
+
 ------------------------------ API - System ------------------------------
 ---Quits this Love program.
 -- @return						#bool		;	Always returns false, but if the quit event propgated fully program would simply exit before this returns.

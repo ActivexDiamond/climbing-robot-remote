@@ -54,7 +54,13 @@ local consoleWindow = {
 }
 
 ------------------------------ Core API ------------------------------
+local lastPrint = 0
 function AutoScene:update(dt)
+	if love.timer.getTime() - lastPrint > 3 then
+		local state = PeripheralApi:getAutoState()
+		self:_echo(state)
+		lastPrint = love.timer.getTime()
+	end
 	--Main Window
 	Slab.BeginWindow(window.id, window)
 	
