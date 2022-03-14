@@ -8,6 +8,8 @@ HOST = 'localhost'
 PORT = 65439
 
 ACK_TEXT = 'text_received'
+conn = 0
+addr = 
 
 
 def main():
@@ -42,7 +44,12 @@ def sendTextViaSocket(message, sock):
     encodedMessage = bytes(message, 'utf-8')
 
     # send the data via the socket to the server
-    sock.sendall(encodedMessage)
+    try:
+        sock.sendall(encodedMessage)
+    except:
+        print("Pipe broken. Lost client. Waiting for new client.")
+        conn, addr = sock.accept()      # Note: execution waits here until the client calls sock.connect()
+
 
     # receive acknowledgment from the server
     encodedAckText = sock.recv(1024)
