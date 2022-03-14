@@ -9,7 +9,7 @@ server.bind((IP, PORT))
 
 print("Entering recv loop.")
 while 1:
-	data, addr = s.recvfrom(1024)
+	data, addr = server.recvfrom(1024)
 	print(data)
 
 
