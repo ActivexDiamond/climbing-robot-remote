@@ -9,6 +9,17 @@ function m.Serial(port, baudrate)
 		print("[dummyPeriphery/serial:write]: " .. str)
 	end
 	
+	function self:read(len)
+		local str = ""
+		for i = 1, len do
+			str = str .. "0"
+		end
+		return str
+	end
+	
+	function self:input_waiting()
+		return 0
+	end
 	return self
 end
 

@@ -1,7 +1,7 @@
 import socket
 import time
 
-IP = ""
+IP = "192.168.0.143"
 PORT = 9004
 
 print("Setting up and binding server.")
