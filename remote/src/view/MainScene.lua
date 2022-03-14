@@ -86,7 +86,7 @@ function MainScene:update(dt)
 	Slab.BeginWindow(window.id, window)
 	
 	--Prj Name
-	local prjNameXPos = window.W - getTextW(AppData.PROJECT_NAME) - 10
+	local prjNameXPos = window.W - getTextW(AppData.PROJECT_NAME) - 40
 	Slab.SetCursorPos(prjNameXPos, 0)
 	Slab.Text(AppData.PROJECT_NAME)
 	Slab.SetCursorPos(prjNameXPos - 7, getTextH("foo"))
