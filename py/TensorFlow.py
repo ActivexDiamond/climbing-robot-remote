@@ -49,8 +49,11 @@ print("Got ping! [{}]".format(peerAddress))
 server.sendto(pingMsgBytes, peerAddress)
 
 def sendCnnData(str):
+    print("Sending out the following cnn data")
+    print(str)
+    print("----- ----- -----")
     strBytes = bytes(str, "utf-8")
-    server.sendto(pingMsgBytes, strBytes)
+    server.sendto(strBytes, peerAddress)
 
 ############################################
 
