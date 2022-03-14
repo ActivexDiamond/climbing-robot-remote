@@ -108,8 +108,8 @@ while True:
             np.squeeze(boxes),
             np.squeeze(classes).astype(np.int32),
             np.squeeze(scores),
-            0.4,                    #min_score_threshold
-            frame)
+            0.4)                    #min_score_threshold
+            #frame)
         sendCnnData(cnnResult)
 		# Draw the results of the detection (aka 'visulaize the results')
         #vis_util.visualize_boxes_and_labels_on_image_array(
