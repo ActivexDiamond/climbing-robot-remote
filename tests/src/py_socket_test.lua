@@ -17,8 +17,8 @@ function love.update(dt)
 	repeat
 		data, err = client:receive()
 		if data then
-			local t = json.parse(data)
-			--print("Got data! " .. data, t)
+			local t = json.decode(data)
+			print("Got data! " .. data, t)
 			for k, v in pairs(t) do
 				print(k, v)
 			end
