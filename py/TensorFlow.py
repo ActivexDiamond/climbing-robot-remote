@@ -28,12 +28,7 @@ server.bind((OPEN_IP, PORT))
 
 print("Entering recv loop.")
 
-luaTemplate = """{{
-  "boxes": {},
-  "classes": {},
-  "scores": {},
-  "minScore": {},
-}}"""
+luaTemplate = """{{"boxes":{},"classes":{},"scores":{},"minScore":{},}}"""
 pingMsgBytes = bytes("pong", "utf-8")
 
 print("Listening for ping.")
