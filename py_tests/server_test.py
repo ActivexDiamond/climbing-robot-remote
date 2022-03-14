@@ -9,7 +9,7 @@ PORT = 65439
 
 ACK_TEXT = 'text_received'
 conn = 0
-addr = 
+addr = 0
 
 
 def main():
