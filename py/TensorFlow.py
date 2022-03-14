@@ -106,9 +106,9 @@ while True:
             feed_dict={image_tensor: frame_expanded})
 
         cnnResult = luaTemplate.format(
-            np.squeeze(boxes),
-            np.squeeze(classes).astype(np.int32),
-            np.squeeze(scores),
+            json.dumps(np.squeeze(boxes)),
+            json.dumps(np.squeeze(classes).astype(np.int32)),
+            json.dumps(np.squeeze(scores)),
             0.4,                    #min_score_threshold
             frame)                  #
         sendCnnData(cnnResult)
