@@ -7,7 +7,7 @@ local State = require "libs.SimpleFsm.State"
 ------------------------------ Constructor ------------------------------
 local LogoScene = class("LogoScene", State)
 function LogoScene:initialize()
-	self.duration = 0.3
+	self.duration = 3
 
 	self.logo = love.graphics.newImage("assets/a_lab_logo.png")
 end

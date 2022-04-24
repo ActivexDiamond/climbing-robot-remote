@@ -255,6 +255,10 @@ end
 ---Checks if the remote is currently connected to the robot. Returns a bool, not the delay.
 -- @return 						#bool		;	Whether the robot is connected or not.
 function PeripheralApi:ping()
+	if AppData.DEBUG_PING_FORCE_TRUE then
+		return true
+	end
+
 	return UdpApi:isConnected()
 end
 

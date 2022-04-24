@@ -25,6 +25,9 @@ local AppData = {
 	--Priviliages
 	CAN_REBOOT_REMOTE = false,
 	CAN_REBOOT_ROBOT = false,
+	
+	--Debugging
+	DEBUG_PING_FORCE_TRUE = false,
 }
 
 function AppData:getVersionString()
