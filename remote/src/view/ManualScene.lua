@@ -171,7 +171,7 @@ function ManualScene:update(dt)
 		callback = function(dir)
 			PeripheralApi:moveWheel(dir)
 		end,
-	}, "Chasis\n[mov]", self.buttonSize, self.buttonPad)
+	}, "Chassis\n[mov]", self.buttonSize, self.buttonPad)
 
 	--Wheel Rot Amount
 	Slab.SetCursorPos(self.buttonOffset * 4.7, window.H - self.buttonOffset * 4.5)
